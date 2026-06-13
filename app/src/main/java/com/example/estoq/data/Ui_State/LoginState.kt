@@ -7,6 +7,13 @@ data class LoginUiState(
     val password: String = "",
     val passwordError: String? = null,
 
+    val confirmPassword: String = "",
+    val confirmPasswordError: String? = null,
+
     val authError: String? = null,
+
+    val forgotPasswordEmailSent: Boolean = false,
+    val forgotPasswordError: String? = null,
+
     val isAuthenticated: Boolean = false
 )

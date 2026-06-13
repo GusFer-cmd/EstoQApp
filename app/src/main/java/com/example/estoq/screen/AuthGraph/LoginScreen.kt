@@ -1,12 +1,13 @@
 package com.example.estoq.screen.AuthGraph
 
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,21 +15,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,7 +52,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.estoq.R
@@ -47,7 +63,8 @@ import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel,
-    onNavigateToHome: () -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -56,6 +73,10 @@ fun LoginScreen(
     val focusManager = LocalFocusManager.current
 
     val state by loginViewModel.uiState.collectAsState()
+    var passwordVisible by remember { mutableStateOf(false) }
+    var forgotPasswordDialogVisible by remember { mutableStateOf(false) }
+    var forgotPasswordEmail by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.isAuthenticated) {
         if (state.isAuthenticated) {
@@ -63,8 +84,17 @@ fun LoginScreen(
         }
     }
 
-    Scaffold (
+    LaunchedEffect(state.forgotPasswordEmailSent) {
+        if (state.forgotPasswordEmailSent) {
+            forgotPasswordDialogVisible = false
+            forgotPasswordEmail = ""
+            snackbarHostState.showSnackbar("Email de recuperação enviado!")
+            loginViewModel.clearForgotPasswordState()
+        }
+    }
 
+    Scaffold (
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
 
         Box(
@@ -100,6 +130,36 @@ fun LoginScreen(
                         fontWeight = FontWeight.SemiBold
                     )
 
+                    state.authError?.let { errorMessage ->
+
+                        Spacer(Modifier.height(10.dp))
+
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            ),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Error,
+                                    contentDescription = "Erro",
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Text(
+                                    text = errorMessage,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+
                     Spacer(Modifier.height(25.dp))
 
                     OutlinedTextField(
@@ -131,12 +191,46 @@ fun LoginScreen(
                         leadingIcon = {
                             Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Lock Icon")
                         },
-                        visualTransformation = PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Filled.VisibilityOff
+                                                  else Icons.Filled.Visibility,
+                                    contentDescription = if (passwordVisible) "Ocultar senha"
+                                                         else "Exibir senha"
+                                )
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None
+                                              else PasswordVisualTransformation(),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    state.passwordError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = "Esqueceu a senha?",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                forgotPasswordDialogVisible = true
+                            }
+                        )
+                    }
+
+                    Spacer(Modifier.height(15.dp))
 
                     Button(
                         onClick = {
@@ -152,17 +246,37 @@ fun LoginScreen(
                         )
                     }
 
-                    Box(
+                    Spacer(Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Não possue conta? ",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Registre-se",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { onNavigateToRegister() }
+                        )
+                    }
+
+                    Text(
+                        text = "Ou",
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "Ou continue com")
-                    }
-
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+            
                     OutlinedButton(
-                        onClick = { Log.d("GOOGLE_LOGIN", "Botão clicado")
+                        onClick = {
                             loginViewModel.singInWithGoogle(
                                 activity,
                                 context.getString(R.string.web_client_id)
@@ -176,7 +290,7 @@ fun LoginScreen(
                         )
 
                         Text(
-                            text = "Login com o Google",
+                            text = "Continue com o Google",
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
@@ -184,10 +298,54 @@ fun LoginScreen(
             }
         }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-private fun LoginPreview() {
-
+    if (forgotPasswordDialogVisible) {
+        AlertDialog(
+            onDismissRequest = {
+                forgotPasswordDialogVisible = false
+                loginViewModel.clearForgotPasswordState()
+            },
+            title = { Text("Recuperar senha") },
+            text = {
+                Column {
+                    Text(
+                        text = "Digite seu e-mail para receber o link de redefinição de senha.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = forgotPasswordEmail,
+                        onValueChange = { forgotPasswordEmail = it },
+                        placeholder = { Text("E-mail") },
+                        leadingIcon = {
+                            Icon(Icons.Rounded.Email, contentDescription = "Email")
+                        },
+                        isError = state.forgotPasswordError != null,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    state.forgotPasswordError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { loginViewModel.forgotPassword(forgotPasswordEmail) }) {
+                    Text("Enviar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    forgotPasswordDialogVisible = false
+                    loginViewModel.clearForgotPasswordState()
+                }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }

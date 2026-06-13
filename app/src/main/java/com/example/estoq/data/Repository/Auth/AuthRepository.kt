@@ -13,6 +13,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +33,11 @@ class AuthRepository (
                     if (task.isSuccessful) {
                         trySend(AuthResponse.Success)
                     } else {
-                        trySend(AuthResponse.Error(errorMessage = task.exception?.message ?: "Erro no login"))
+                        val errorCode = (task.exception as? FirebaseAuthException)?.errorCode
+                        trySend(AuthResponse.Error(
+                            errorMessage = task.exception?.message ?: "Erro no login",
+                            errorCode = errorCode
+                        ))
                     }
                 }
 
@@ -46,10 +51,31 @@ class AuthRepository (
                     if (task.isSuccessful) {
                         trySend(AuthResponse.Success)
                     } else {
-                        trySend(AuthResponse.Error(errorMessage = task.exception?.message ?: "Erro no login"))
+                        val errorCode = (task.exception as? FirebaseAuthException)?.errorCode
+                        trySend(AuthResponse.Error(
+                            errorMessage = task.exception?.message ?: "Erro no login",
+                            errorCode = errorCode
+                        ))
                     }
                 }
 
+            awaitClose()
+        }
+
+    fun sendPasswordResetEmail(email: String): Flow<AuthResponse> =
+        callbackFlow {
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(AuthResponse.Success)
+                    } else {
+                        val errorCode = (task.exception as? FirebaseAuthException)?.errorCode
+                        trySend(AuthResponse.Error(
+                            errorMessage = task.exception?.message ?: "Erro ao enviar email",
+                            errorCode = errorCode
+                        ))
+                    }
+                }
             awaitClose()
         }
 
