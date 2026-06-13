@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_number": "968916144284",
+    "project_id": "estoqapp-e677b",
+    "storage_bucket": "estoqapp-e677b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968916144284:android:6b7a1b9113fce4da67dd59",
+        "android_client_info": {
+          "package_name": "com.example.estoq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "968916144284-2j64bogeaek0ptjj4ocqidolkjnkuom2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.estoq",
+            "certificate_hash": "c4581eb5afa35d5bc7b7673c45d01299ed1910bb"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgTVtXZOENiF3Q7ySHZwUz63zhK4k90-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "968916144284-68hmniui8irlc4noot3nqov851drmbli.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
