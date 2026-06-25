@@ -1,22 +1,43 @@
 package com.example.estoq.screen.Navegation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
+import com.example.estoq.data.Viewmodel.Item.ItemViewModel
+import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
 import com.example.estoq.screen.AuthGraph.LoginScreen
 import com.example.estoq.screen.AuthGraph.RegisterScreen
 import com.example.estoq.screen.MainGraph.HomeScreen
+import com.example.estoq.screen.MainGraph.Item.ItemCreateScreen
+import com.example.estoq.screen.MainGraph.Item.ItemScreen
+import com.example.estoq.screen.MainGraph.Item.ItemUpdateScreen
+import com.example.estoq.screen.MainGraph.Storage.StorageCreateScreen
+import com.example.estoq.screen.MainGraph.Storage.StorageScreen
+import com.example.estoq.screen.MainGraph.Storage.StorageUpdateScreen
 import com.example.estoq.screen.SplashScreen
 
 @Composable
-fun AppNavGraph() {
-    val navController = rememberNavController()
+fun AppNavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    val storageViewModel: StorageViewModel = koinViewModel()
+    val itemViewModel: ItemViewModel = koinViewModel()
+    val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
+    val items by itemViewModel.allItems.collectAsState(initial = emptyList())
+
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route
+        startDestination = Screen.Splash.route,
+        modifier = modifier
     ) {
         composable(Screen.Splash.route) {
 
@@ -91,8 +112,12 @@ fun AppNavGraph() {
 
             val loginViewModel: LoginViewModel = koinViewModel()
 
+            val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
+
             HomeScreen(
                 loginViewModel = loginViewModel,
+                totalStorages = storages.size,
+                totalItems = items.size,
                 onLogout = {
                     navController.navigate(
                         Screen.Login.route
@@ -102,5 +127,85 @@ fun AppNavGraph() {
                 }
             )
         }
+
+        composable(Screen.StorageIndex.route) {
+            StorageScreen(
+                storageViewModel = storageViewModel,
+                onNavigateToCreate = {
+                    storageViewModel.resetState()
+                    navController.navigate(Screen.StorageCreate.route)
+                },
+                onNavigateToUpdate = { id ->
+                    navController.navigate(Screen.StorageUpdate.createRoute(id))
+                }
+            )
+        }
+
+        composable(Screen.StorageCreate.route) {
+            StorageCreateScreen(
+                storageViewModel = storageViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.StorageUpdate.route,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getLong("id") ?: 0L
+
+            StorageUpdateScreen(
+                id = id,
+                storageViewModel = storageViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        composable(Screen.ItemIndex.route) {
+            ItemScreen(
+                itemViewModel = itemViewModel,
+                onNavigateToCreate = {
+                    itemViewModel.resetState()
+                    navController.navigate(Screen.ItemCreate.route)
+                },
+                onNavigateToUpdate = { id ->
+                    navController.navigate(Screen.ItemUpdate.createRoute(id))
+                }
+            )
+        }
+
+        composable(Screen.ItemCreate.route) {
+            ItemCreateScreen(
+                itemViewModel = itemViewModel,
+                availableStorages = storages,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ItemUpdate.route,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getLong("id") ?: 0L
+
+            ItemUpdateScreen(
+                id = id,
+                itemViewModel = itemViewModel,
+                availableStorages = storages,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
     }
 }

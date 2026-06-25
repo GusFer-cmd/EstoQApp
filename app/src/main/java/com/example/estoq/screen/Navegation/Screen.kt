@@ -1,14 +1,43 @@
 package com.example.estoq.screen.Navegation
 
+import androidx.compose.ui.graphics.vector.ImageVector
+
 sealed class Screen(
     val route: String
 ) {
 
     object Splash : Screen("splash")
-
     object Login : Screen("login")
-
     object Register : Screen("register")
-
     object Home : Screen("home")
+
+    object StorageIndex : Screen("storage/index")
+    object StorageCreate : Screen("storage/create")
+    object StorageUpdate : Screen("storage/update/{id}") {
+        fun createRoute(id: Long) = "storage/update/$id"
+    }
+    object StorageDelete : Screen("storage/delete")
+
+    object ItemIndex : Screen("item/index")
+    object ItemCreate : Screen("item/create")
+    object ItemUpdate : Screen("item/update/{id}") {
+        fun createRoute(id: Long) = "item/update/$id"
+    }
+    object ItemDelete : Screen("item/delete")
+
+    object ProductIndex : Screen("product/index")
+
+    object ProductIndexCategory : Screen("product/category/{id}") {
+        fun createRoute(id: Long) = "product/category/$id"
+    }
+
+    object ClientIndex : Screen("client/index")
+
+    object SalesIndex : Screen("client/index")
 }
+
+data class BottomNavItem(
+    val screen: Screen,
+    val icon: ImageVector,
+    val label: String
+)

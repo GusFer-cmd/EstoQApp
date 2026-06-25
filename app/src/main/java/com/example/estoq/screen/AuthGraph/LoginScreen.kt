@@ -93,7 +93,7 @@ fun LoginScreen(
         }
     }
 
-    Scaffold (
+    Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
 
@@ -214,6 +214,8 @@ fun LoginScreen(
                             fontSize = 12.sp
                         )
                     }
+
+                    Spacer(Modifier.height(8.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),

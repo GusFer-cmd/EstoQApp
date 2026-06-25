@@ -10,10 +10,18 @@ val databaseModule = module {
             get(),
             Database::class.java,
             "estoq_db"
-        ).build()
+        ).fallbackToDestructiveMigration(true).build()
     }
 
     single {
         get<Database>().userDao()
+    }
+
+    single {
+        get<Database>().storageDao()
+    }
+
+    single {
+        get<Database>().itemDao()
     }
 }

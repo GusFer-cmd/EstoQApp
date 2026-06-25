@@ -66,6 +66,8 @@ dependencies {
     implementation("io.insert-koin:koin-android:4.1.0")//Koin para injeção de dependências
     implementation("io.insert-koin:koin-androidx-compose:4.1.0") //Koin para Compose
 
+    implementation("io.coil-kt:coil-compose:2.7.0") // Coil
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

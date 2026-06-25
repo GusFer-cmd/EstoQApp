@@ -24,6 +24,13 @@ class LoginViewModel (
         _uiState.value = LoginUiState()
     }
 
+    fun clearForgotPasswordState() {
+        _uiState.value = _uiState.value.copy(
+            forgotPasswordEmailSent = false,
+            forgotPasswordError = null
+        )
+    }
+
     fun onEmailChange(value: String) {
         _uiState.value =
             _uiState.value.copy(
@@ -259,13 +266,6 @@ class LoginViewModel (
                 )
             }
         }
-    }
-
-    fun clearForgotPasswordState() {
-        _uiState.value = _uiState.value.copy(
-            forgotPasswordEmailSent = false,
-            forgotPasswordError = null
-        )
     }
 
     fun logout() {
