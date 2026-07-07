@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.estoq.component.Container
+import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Model.Storage.Storage
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
 import java.io.File
@@ -87,6 +88,10 @@ fun ItemCreateScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val selectedStorage = availableStorages.find { it.id == state.storageId }
+
+    var typeExpanded by remember { mutableStateOf(false) }
+    var sizeExpanded by remember { mutableStateOf(false) }
+    val availableSizes = remember(state.type) { state.type.availableSizes() }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -206,6 +211,101 @@ fun ItemCreateScreen(
                     )
 
                     state.brandError?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "Tipo",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = typeExpanded,
+                        onExpandedChange = { typeExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = state.type.displayName,
+                            onValueChange = {},
+                            readOnly = true,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                            singleLine = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = typeExpanded,
+                            onDismissRequest = { typeExpanded = false }
+                        ) {
+                            ItemType.entries.forEach { itemType ->
+                                DropdownMenuItem(
+                                    text = { Text(itemType.displayName) },
+                                    onClick = {
+                                        itemViewModel.onTypeChange(itemType)
+                                        typeExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "Tamanho",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = sizeExpanded,
+                        onExpandedChange = { sizeExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = state.size,
+                            onValueChange = {},
+                            readOnly = true,
+                            isError = state.sizeError != null,
+                            placeholder = { Text("Selecione um tamanho") },
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                            singleLine = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sizeExpanded) }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = sizeExpanded,
+                            onDismissRequest = { sizeExpanded = false }
+                        ) {
+                            availableSizes.forEach { size ->
+                                DropdownMenuItem(
+                                    text = { Text(size) },
+                                    onClick = {
+                                        itemViewModel.onSizeChange(size)
+                                        sizeExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    state.sizeError?.let {
                         Text(
                             text = it,
                             color = MaterialTheme.colorScheme.error,

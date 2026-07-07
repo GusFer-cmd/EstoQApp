@@ -211,13 +211,13 @@ class StorageViewModel(
         }
     }
 
-    fun deleteStorage(storage: Storage) {
+    fun deleteStorage(id: Long) {
         viewModelScope.launch {
             try {
-                if (storage.id == 0L) throw StorageException.InvalidIdException()
+                if (id == 0L) throw StorageException.InvalidIdException()
 
                 _uiState.value = _uiState.value.copy(isLoading = true)
-                repository.delete(storage)
+                repository.delete(id)
                 _uiState.value = _uiState.value.copy(isLoading = false, isDeleted = true)
             } catch (e: StorageException) {
                 _uiState.value = _uiState.value.copy(

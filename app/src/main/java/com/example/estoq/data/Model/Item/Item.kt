@@ -13,5 +13,7 @@ data class Item(
     val stockQuantity: Int,
     val imagePath: String? = null,
     val storageId: Long,
+    val type: ItemType = ItemType.BLUSA,
+    val size: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )

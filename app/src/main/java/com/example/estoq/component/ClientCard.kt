@@ -18,17 +18,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,32 +37,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.estoq.R
-import com.example.estoq.data.Model.Storage.Storage
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.estoq.data.Model.Client.Client
 
 @Composable
-fun StorageCard(
-    storage: Storage,
+fun ClientCard(
+    client: Client,
+    onClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-
     val showDialog = remember { mutableStateOf(false) }
-    var clicked by remember { mutableStateOf(false) }
 
     if (showDialog.value) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
             shape = RoundedCornerShape(20.dp),
-
             title = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -93,21 +85,18 @@ fun StorageCard(
                     )
                 }
             },
-
             text = {
                 Text(
-                    text = "Ao selecionar 'Deletar' o estoque será apagado.",
+                    text = "Ao selecionar 'Deletar' o cliente será apagado.",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
             },
-
             confirmButton = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     OutlinedButton(
                         modifier = Modifier.weight(1f),
                         onClick = { showDialog.value = false },
@@ -134,98 +123,82 @@ fun StorageCard(
         )
     }
 
-    val dateFormat = remember {
-        SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault())
-    }
-
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{ clicked = !clicked }
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
-            .fillMaxWidth()
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .width(20.dp)
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
-                    .background(Color(storage.mainColor.toInt()))
-            )
-            Row(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .weight(1f),
-                verticalAlignment = Alignment.Top
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                Column(modifier = Modifier
-                    .weight(1f)) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
-                    Text(
-                        text = storage.title,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
+            Spacer(Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "${client.firstName} ${client.lastName}".trim(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = client.telephone,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp
+                )
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                IconButton(
+                    onClick = onEditClick,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.Blue)
+                        .padding(10.dp, 10.dp)
+                        .size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar",
+                        tint = Color.White,
                     )
-
-                    Spacer(Modifier.height(4.dp))
-
-                    Text(
-                        text = "Criado em: ${dateFormat.format(Date(storage.createdAt))}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        IconButton(
-                            onClick = onEditClick,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(Color.Blue)
-                                .padding(15.dp,10.dp)
-                                .size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Editar",
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { showDialog.value = true },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(Color.Red)
-                                .padding(15.dp,10.dp)
-                                .size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Lixeira",
-                            )
-                        }
-                    }
                 }
 
-                Spacer(Modifier.width(16.dp))
-
-                Box(
+                IconButton(
+                    onClick = { showDialog.value = true },
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(storage.mainColor.toInt()))
-                )
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.Red)
+                        .padding(10.dp, 10.dp)
+                        .size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Deletar",
+                        tint = Color.White,
+                    )
+                }
             }
         }
     }

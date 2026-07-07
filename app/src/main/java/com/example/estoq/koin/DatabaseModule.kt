@@ -1,6 +1,7 @@
 package com.example.estoq.koin
 
 import androidx.room.Room
+import com.example.estoq.data.Dao.Client.ClientDao
 import com.example.estoq.data.Database.Database
 import org.koin.dsl.module
 
@@ -23,5 +24,9 @@ val databaseModule = module {
 
     single {
         get<Database>().itemDao()
+    }
+
+    single {
+        get<Database>().clientDao()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.estoq.koin
 
+import com.example.estoq.data.Repository.Client.ClientRepository
 import com.example.estoq.data.Repository.Item.ItemRepository
 import com.example.estoq.data.Repository.Storage.StorageRepository
 import com.example.estoq.data.Repository.User.UserRepository
@@ -16,5 +17,9 @@ val repositoryModule = module {
 
     single {
         ItemRepository(get())
+    }
+
+    single {
+        ClientRepository(get())
     }
 }

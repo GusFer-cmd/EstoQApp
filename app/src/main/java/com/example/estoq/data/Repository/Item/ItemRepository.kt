@@ -39,9 +39,9 @@ class ItemRepository(private val itemDao: ItemDao) {
         }
     }
 
-    suspend fun delete(item: Item) {
+    suspend fun delete(id: Long) {
         try {
-            itemDao.delete(item)
+            itemDao.delete(id)
         } catch (e: Exception) {
             throw ItemException.ItemUnknownException()
         }

@@ -1,5 +1,6 @@
 package com.example.estoq.screen.MainGraph.Item
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.estoq.component.Container
 import com.example.estoq.component.ItemCard
+import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,12 +59,9 @@ fun ItemScreen(
     val state by itemViewModel.uiState.collectAsState()
 
     val searchQuery by itemViewModel.searchQuery.collectAsState()
+    val selectedTypeFilter by itemViewModel.selectedTypeFilter.collectAsState()
 
-    val itemsFlow = remember(searchQuery) {
-        if (searchQuery.isNotBlank()) itemViewModel.searchByNameOrBrand(searchQuery)
-        else itemViewModel.allItems
-    }
-    val items by itemsFlow.collectAsState(initial = emptyList())
+    val items by itemViewModel.filteredItems.collectAsState(initial = emptyList())
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -148,6 +149,29 @@ fun ItemScreen(
                     )
                 }
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = selectedTypeFilter == null,
+                        onClick = { itemViewModel.onTypeFilterChange(null) },
+                        label = { Text("Todas") }
+                    )
+                    ItemType.entries.forEach { type ->
+                        FilterChip(
+                            selected = selectedTypeFilter == type,
+                            onClick = { itemViewModel.onTypeFilterChange(type) },
+                            label = { Text(type.displayName) }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(4.dp))
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -177,7 +201,7 @@ fun ItemScreen(
                                         item = item,
                                         storageName = storageMap[item.storageId] ?: "Desconhecido",
                                         onEditClick = { onNavigateToUpdate(item.id) },
-                                        onDeleteClick = { itemViewModel.deleteItem(item) }
+                                        onDeleteClick = { itemViewModel.deleteItem(item.id) }
                                     )
                                 }
                             }

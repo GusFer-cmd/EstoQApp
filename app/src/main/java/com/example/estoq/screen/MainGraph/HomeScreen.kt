@@ -31,11 +31,13 @@ fun HomeScreen(
     loginViewModel: LoginViewModel,
     totalStorages: Int,
     totalItems: Int,
+    totalClients: Int,
     onLogout: () -> Unit
 ) {
 
     val storages = totalStorages
     val items = totalItems
+    val clients = totalClients
 
     Scaffold(
         topBar = {
@@ -71,7 +73,7 @@ fun HomeScreen(
                             HomeCard(
                                 cardIcon = Icons.Default.PeopleAlt,
                                 cardTittle = "Clientes",
-                                cardTotalNumber = 19,
+                                cardTotalNumber = clients.toLong(),
                                 cardBackground = Color.Cyan
                             )
                         }

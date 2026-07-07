@@ -32,8 +32,15 @@ sealed class Screen(
     }
 
     object ClientIndex : Screen("client/index")
+    object ClientCreate : Screen("client/create")
+    object ClientUpdate : Screen("client/update/{id}") {
+        fun createRoute(id: Long) = "client/update/$id"
+    }
+    object ClientDetail : Screen("client/detail/{id}") {
+        fun createRoute(id: Long) = "client/detail/$id"
+    }
 
-    object SalesIndex : Screen("client/index")
+    object SalesIndex : Screen("sales/index")
 }
 
 data class BottomNavItem(

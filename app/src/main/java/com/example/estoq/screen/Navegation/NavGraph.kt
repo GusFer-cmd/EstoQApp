@@ -11,10 +11,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
+import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
 import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
 import com.example.estoq.screen.AuthGraph.LoginScreen
 import com.example.estoq.screen.AuthGraph.RegisterScreen
+import com.example.estoq.screen.MainGraph.Client.ClientCreateScreen
+import com.example.estoq.screen.MainGraph.Client.ClientDetailScreen
+import com.example.estoq.screen.MainGraph.Client.ClientScreen
+import com.example.estoq.screen.MainGraph.Client.ClientUpdateScreen
 import com.example.estoq.screen.MainGraph.HomeScreen
 import com.example.estoq.screen.MainGraph.Item.ItemCreateScreen
 import com.example.estoq.screen.MainGraph.Item.ItemScreen
@@ -31,8 +36,10 @@ fun AppNavGraph(
 ) {
     val storageViewModel: StorageViewModel = koinViewModel()
     val itemViewModel: ItemViewModel = koinViewModel()
+    val clientViewModel: ClientViewModel = koinViewModel()
     val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
     val items by itemViewModel.allItems.collectAsState(initial = emptyList())
+    val clients by clientViewModel.allClients.collectAsState(initial = emptyList())
 
     NavHost(
         navController = navController,
@@ -118,6 +125,7 @@ fun AppNavGraph(
                 loginViewModel = loginViewModel,
                 totalStorages = storages.size,
                 totalItems = items.size,
+                totalClients = clients.size,
                 onLogout = {
                     navController.navigate(
                         Screen.Login.route
@@ -207,5 +215,61 @@ fun AppNavGraph(
             )
         }
 
+        composable(Screen.ClientIndex.route) {
+            ClientScreen(
+                clientViewModel = clientViewModel,
+                onNavigateToCreate = {
+                    clientViewModel.resetState()
+                    navController.navigate(Screen.ClientCreate.route)
+                },
+                onNavigateToUpdate = { id ->
+                    navController.navigate(Screen.ClientUpdate.createRoute(id))
+                },
+                onNavigateToDetail = { id ->
+                    navController.navigate(Screen.ClientDetail.createRoute(id))
+                }
+            )
+        }
+
+        composable(Screen.ClientCreate.route) {
+            ClientCreateScreen(
+                clientViewModel = clientViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ClientUpdate.route,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getLong("id") ?: 0L
+
+            ClientUpdateScreen(
+                id = id,
+                clientViewModel = clientViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ClientDetail.route,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getLong("id") ?: 0L
+
+            ClientDetailScreen(
+                id = id,
+                clientViewModel = clientViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }

@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.estoq.data.Exceptions.Item.ItemException
 import com.example.estoq.data.Model.Item.Item
+import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Repository.Item.ItemRepository
 import com.example.estoq.data.Repository.Storage.StorageRepository
 import com.example.estoq.data.Ui_State.Item.ItemUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ItemViewModel(
@@ -28,12 +30,46 @@ class ItemViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
+    private val _selectedTypeFilter = MutableStateFlow<ItemType?>(null)
+    val selectedTypeFilter: StateFlow<ItemType?> = _selectedTypeFilter
+
+    val filteredItems: Flow<List<Item>> = combine(
+        _searchQuery, _selectedTypeFilter, allItems
+    ) { query, typeFilter, items ->
+        items.filter { item ->
+            val matchesQuery = query.isBlank() ||
+                    item.name.contains(query, ignoreCase = true) ||
+                    item.brand.contains(query, ignoreCase = true)
+            val matchesType = typeFilter == null || item.type == typeFilter
+            matchesQuery && matchesType
+        }
+    }
+
+    fun onTypeFilterChange(type: ItemType?) {
+        _selectedTypeFilter.value = type
+    }
+
     fun onNameChange(value: String) {
         _uiState.value = _uiState.value.copy(name = value, nameError = null)
     }
 
     fun onBrandChange(value: String) {
         _uiState.value = _uiState.value.copy(brand = value, brandError = null)
+    }
+
+    fun onTypeChange(type: ItemType) {
+        val current = _uiState.value
+        val resetSize = current.type != type
+        _uiState.value = current.copy(
+            type = type,
+            typeError = null,
+            size = if (resetSize) "" else current.size,
+            sizeError = if (resetSize) null else current.sizeError
+        )
+    }
+
+    fun onSizeChange(size: String) {
+        _uiState.value = _uiState.value.copy(size = size, sizeError = null)
     }
 
     fun onPriceChange(value: String) {
@@ -109,6 +145,8 @@ class ItemViewModel(
                         stockQuantity = item.stockQuantity.toString(),
                         imagePath = item.imagePath,
                         storageId = item.storageId,
+                        type = item.type,
+                        size = item.size,
                         createdAt = item.createdAt,
                         isLoading = false
                     )
@@ -143,13 +181,14 @@ class ItemViewModel(
                 if (state.storageId == 0L) {
                     throw ItemException.EmptyStorageException()
                 }
-
                 if (state.currentPrice.isBlank()) {
                     throw ItemException.InvalidPriceException()
                 }
-
                 if (state.stockQuantity.isBlank()) {
                     throw ItemException.InvalidQuantityException()
+                }
+                if (state.size.isBlank()) {
+                    throw ItemException.EmptySizeException()
                 }
 
                 _uiState.value = state.copy(isLoading = true)
@@ -161,7 +200,9 @@ class ItemViewModel(
                         currentPrice = parsePrice(state.currentPrice),
                         stockQuantity = state.stockQuantity.toInt(),
                         imagePath = state.imagePath,
-                        storageId = state.storageId
+                        storageId = state.storageId,
+                        type = state.type,
+                        size = state.size
                     )
                 )
 
@@ -183,6 +224,8 @@ class ItemViewModel(
                         _uiState.value.copy(stockQuantityError = e.message)
                     is ItemException.EmptyStorageException ->
                         _uiState.value.copy(storageIdError = e.message)
+                    is ItemException.EmptySizeException ->
+                        _uiState.value.copy(sizeError = e.message)
                     is ItemException.ItemUnknownException ->
                         _uiState.value.copy(error = e.message)
                     else -> _uiState.value.copy(error = e.message)
@@ -213,13 +256,14 @@ class ItemViewModel(
                 if (state.id == 0L) {
                     throw ItemException.InvalidIdException()
                 }
-
                 if (state.currentPrice.isBlank()) {
                   throw ItemException.InvalidPriceException()
                 }
-
                 if (state.stockQuantity.isBlank()) {
                    throw ItemException.InvalidQuantityException()
+                }
+                if (state.size.isBlank()) {
+                    throw ItemException.EmptySizeException()
                 }
 
                 _uiState.value = state.copy(isLoading = true)
@@ -233,6 +277,8 @@ class ItemViewModel(
                         stockQuantity = state.stockQuantity.toInt(),
                         imagePath = state.imagePath,
                         storageId = state.storageId,
+                        type = state.type,
+                        size = state.size,
                         createdAt = state.createdAt
                     )
                 )
@@ -241,6 +287,7 @@ class ItemViewModel(
                     isLoading = false,
                     isUpdated = true
                 )
+
             } catch (e: ItemException) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 _uiState.value = when (e) {
@@ -254,6 +301,8 @@ class ItemViewModel(
                         _uiState.value.copy(stockQuantityError = e.message)
                     is ItemException.EmptyStorageException ->
                         _uiState.value.copy(storageIdError = e.message)
+                    is ItemException.EmptySizeException ->
+                        _uiState.value.copy(sizeError = e.message)
                     is ItemException.InvalidIdException ->
                         _uiState.value.copy(error = e.message)
                     is ItemException.ItemUnknownException ->
@@ -269,13 +318,13 @@ class ItemViewModel(
         }
     }
 
-    fun deleteItem(item: Item) {
+    fun deleteItem(id: Long) {
         viewModelScope.launch {
             try {
-                if (item.id == 0L) throw ItemException.InvalidIdException()
+                if (id == 0L) throw ItemException.InvalidIdException()
 
                 _uiState.value = _uiState.value.copy(isLoading = true)
-                itemRepository.delete(item)
+                itemRepository.delete(id)
                 _uiState.value = _uiState.value.copy(isLoading = false, isDeleted = true)
             } catch (e: ItemException) {
                 _uiState.value = _uiState.value.copy(

@@ -115,7 +115,7 @@ fun StorageScreen(
                                     StorageCard(
                                         storage = storage,
                                         onEditClick = { onNavigateToUpdate(storage.id) },
-                                        onDeleteClick = { storageViewModel.deleteStorage(storage) }
+                                        onDeleteClick = { storageViewModel.deleteStorage(storage.id) }
                                     )
                                 }
                             }

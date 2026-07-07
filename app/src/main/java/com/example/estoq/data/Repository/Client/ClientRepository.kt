@@ -10,7 +10,7 @@ class ClientRepository(private val clientDao: ClientDao) {
     fun getAll(): Flow<List<Client>> = clientDao.getAll()
 
     fun searchByName(query: String): Flow<List<Client>> =
-        clientDao.searchByFirstName(query)
+        clientDao.searchByName(query)
 
     suspend fun getById(id: Long): Client? {
         return try {
@@ -36,9 +36,9 @@ class ClientRepository(private val clientDao: ClientDao) {
         }
     }
 
-    suspend fun delete(client: Client) {
+    suspend fun delete(id: Long) {
         try {
-            clientDao.delete(client)
+            clientDao.delete(id)
         } catch (e: Exception) {
             throw ClientException.ClientUnknownException()
         }

@@ -1,6 +1,7 @@
 package com.example.estoq.koin
 
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
+import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
 import org.koin.dsl.module
 import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
@@ -23,5 +24,9 @@ val viewModelModule = module {
 
     viewModel {
         ItemViewModel(get(), get())
+    }
+
+    viewModel {
+        ClientViewModel(get())
     }
 }

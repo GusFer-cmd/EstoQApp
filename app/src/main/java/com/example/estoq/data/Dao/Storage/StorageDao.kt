@@ -24,6 +24,6 @@ interface StorageDao {
     @Update
     suspend fun update(storage: Storage)
 
-    @Delete
-    suspend fun delete(storage: Storage)
+    @Query("DELETE FROM Storage WHERE id = :id")
+    suspend fun delete(id: Long)
 }

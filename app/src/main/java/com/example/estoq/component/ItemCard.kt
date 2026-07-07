@@ -240,6 +240,16 @@ fun ItemCard(
                     fontSize = 16.sp
                 )
 
+                Spacer(Modifier.height(2.dp))
+
+                Text(
+                    text = "${item.type.displayName} - ${item.size}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    maxLines = 1,
+                    fontSize = 14.sp
+                )
+
                 Spacer(Modifier.height(8.dp))
 
                 Text(

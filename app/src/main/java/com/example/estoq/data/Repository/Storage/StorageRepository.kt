@@ -33,9 +33,9 @@ class StorageRepository(private val storageDao: StorageDao) {
         }
     }
 
-    suspend fun delete(storage: Storage) {
+    suspend fun delete(id: Long) {
         try {
-            storageDao.delete(storage)
+            storageDao.delete(id)
         } catch (e: Exception) {
             throw StorageException.ItemUnknownException()
         }
