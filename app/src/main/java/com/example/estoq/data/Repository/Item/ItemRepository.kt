@@ -12,8 +12,8 @@ class ItemRepository(private val itemDao: ItemDao) {
     fun getByStorageId(storageId: Long): Flow<List<Item>> =
         itemDao.getByStorageId(storageId)
 
-    fun searchByNameOrBrand(query: String): Flow<List<Item>> =
-        itemDao.searchByNameOrBrand(query)
+    fun searchByNameOrBrandAndType(query: String, type: String?): Flow<List<Item>> =
+        itemDao.searchByNameOrBrandAndType(query, type)
 
     suspend fun getById(id: Long): Item? {
         return try {

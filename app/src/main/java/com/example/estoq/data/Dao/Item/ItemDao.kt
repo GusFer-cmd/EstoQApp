@@ -15,14 +15,14 @@ interface ItemDao {
     @Query("SELECT * FROM Item ORDER BY createdAt DESC")
     fun getAll(): Flow<List<Item>>
 
+    @Query("SELECT * FROM Item WHERE (name LIKE '%' || :query || '%' OR brand LIKE '%' || :query || '%') AND (:type IS NULL OR type = :type) ORDER BY createdAt DESC")
+    fun searchByNameOrBrandAndType(query: String, type: String?): Flow<List<Item>>
+
     @Query("SELECT * FROM Item WHERE id = :id")
     suspend fun getById(id: Long): Item?
 
     @Query("SELECT * FROM Item WHERE storageId = :storageId ORDER BY createdAt DESC")
     fun getByStorageId(storageId: Long): Flow<List<Item>>
-
-    @Query("SELECT * FROM Item WHERE name LIKE '%' || :query || '%' OR brand LIKE '%' || :query || '%' ORDER BY createdAt DESC")
-    fun searchByNameOrBrand(query: String): Flow<List<Item>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: Item): Long

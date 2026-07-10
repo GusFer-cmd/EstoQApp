@@ -16,19 +16,14 @@ sealed class Screen(
     object StorageUpdate : Screen("storage/update/{id}") {
         fun createRoute(id: Long) = "storage/update/$id"
     }
-    object StorageDelete : Screen("storage/delete")
 
     object ItemIndex : Screen("item/index")
     object ItemCreate : Screen("item/create")
     object ItemUpdate : Screen("item/update/{id}") {
         fun createRoute(id: Long) = "item/update/$id"
     }
-    object ItemDelete : Screen("item/delete")
-
-    object ProductIndex : Screen("product/index")
-
-    object ProductIndexCategory : Screen("product/category/{id}") {
-        fun createRoute(id: Long) = "product/category/$id"
+    object ItemIndexStorage : Screen("item/storage/{storageId}") {
+        fun createRoute(storageId: Long) = "item/storage/$storageId"
     }
 
     object ClientIndex : Screen("client/index")

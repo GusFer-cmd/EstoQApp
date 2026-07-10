@@ -52,12 +52,12 @@ import java.util.Locale
 @Composable
 fun StorageCard(
     storage: Storage,
+    onNavigateToItemStorage: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
 
     val showDialog = remember { mutableStateOf(false) }
-    var clicked by remember { mutableStateOf(false) }
 
     if (showDialog.value) {
         AlertDialog(
@@ -142,7 +142,7 @@ fun StorageCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{ clicked = !clicked }
+            .clickable{ onNavigateToItemStorage() }
     ) {
         Row(
             modifier = Modifier

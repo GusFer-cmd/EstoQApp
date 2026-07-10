@@ -9,11 +9,9 @@ import com.example.estoq.data.Ui_State.Client.ClientUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class ClientSection(
@@ -32,29 +30,22 @@ class ClientViewModel(
 
     val uiState: StateFlow<ClientUiState> = _uiState
 
-    val clients: StateFlow<List<Client>> = _searchQuery
-        .flatMapLatest { query ->
-            if (query.isBlank()) clientRepository.getAll()
-            else clientRepository.searchByName(query)
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val filteredClients: Flow<List<Client>> = _searchQuery.flatMapLatest { query ->
+        if (query.isBlank()) clientRepository.getAll()
+        else clientRepository.searchByName(query)
+    }
 
-    val sections: StateFlow<List<ClientSection>> = clients.map { list ->
+    val sections: Flow<List<ClientSection>> = filteredClients.map { list ->
         list.groupBy {
             val fullName = "${it.firstName} ${it.lastName}".trim()
             fullName.first().uppercaseChar()
         }
             .map { (letter, clients) -> ClientSection(letter, clients) }
             .sortedBy { it.letter }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
-    }
-
-    fun searchByClientName(query: String): Flow<List<Client>> {
-        return if (query.isBlank()) clientRepository.getAll()
-        else clientRepository.searchByName(query)
     }
 
     fun onFirstNameChange(value: String) {
@@ -148,7 +139,7 @@ class ClientViewModel(
                 )
 
             } catch (e: ClientException) {
-                _uiState.value = _uiState.value.copy(isLoading = true)
+                _uiState.value = _uiState.value.copy(isLoading = false)
                 _uiState.value = when (e) {
                     is ClientException.EmptyFirstName ->
                         _uiState.value.copy(firstNameError = e.message)
@@ -202,7 +193,7 @@ class ClientViewModel(
                 )
 
             } catch (e: ClientException) {
-                _uiState.value = _uiState.value.copy(isLoading = true)
+                _uiState.value = _uiState.value.copy(isLoading = false)
                 _uiState.value = when (e) {
                     is ClientException.EmptyFirstName ->
                         _uiState.value.copy(firstNameError = e.message)

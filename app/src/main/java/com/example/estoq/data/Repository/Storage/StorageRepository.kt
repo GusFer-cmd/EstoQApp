@@ -9,6 +9,9 @@ class StorageRepository(private val storageDao: StorageDao) {
 
     fun getAll(): Flow<List<Storage>> = storageDao.getAll()
 
+    fun searchByTitle(query: String): Flow<List<Storage>> =
+        storageDao.searchByTittle(query)
+
     suspend fun getById(id: Long): Storage? {
         return try {
             storageDao.getById(id)

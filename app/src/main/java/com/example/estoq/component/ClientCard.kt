@@ -169,7 +169,9 @@ fun ClientCard(
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 IconButton(
                     onClick = onEditClick,
                     modifier = Modifier

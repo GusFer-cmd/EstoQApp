@@ -15,6 +15,9 @@ interface StorageDao {
     @Query("SELECT * FROM Storage ORDER BY createdAt DESC")
     fun getAll(): Flow<List<Storage>>
 
+    @Query("SELECT * FROM Storage WHERE title LIKE '%' || :query || '%' ORDER BY createdAt DESC")
+    fun searchByTittle(query: String): Flow<List<Storage>>
+
     @Query("SELECT * FROM Storage WHERE id = :id")
     suspend fun getById(id: Long): Storage?
 

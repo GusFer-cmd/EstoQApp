@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
+import com.example.estoq.data.Viewmodel.Item.ItemCategoryViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
 import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
 import com.example.estoq.screen.AuthGraph.LoginScreen
@@ -21,6 +22,7 @@ import com.example.estoq.screen.MainGraph.Client.ClientDetailScreen
 import com.example.estoq.screen.MainGraph.Client.ClientScreen
 import com.example.estoq.screen.MainGraph.Client.ClientUpdateScreen
 import com.example.estoq.screen.MainGraph.HomeScreen
+import com.example.estoq.screen.MainGraph.Item.ItemCategoryScreen
 import com.example.estoq.screen.MainGraph.Item.ItemCreateScreen
 import com.example.estoq.screen.MainGraph.Item.ItemScreen
 import com.example.estoq.screen.MainGraph.Item.ItemUpdateScreen
@@ -145,6 +147,9 @@ fun AppNavGraph(
                 },
                 onNavigateToUpdate = { id ->
                     navController.navigate(Screen.StorageUpdate.createRoute(id))
+                },
+                onNavigateToItemStorage = { storageId ->
+                    navController.navigate(Screen.ItemIndexStorage.createRoute(storageId))
                 }
             )
         }
@@ -209,6 +214,25 @@ fun AppNavGraph(
                 id = id,
                 itemViewModel = itemViewModel,
                 availableStorages = storages,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ItemIndexStorage.route,
+            arguments = listOf(navArgument("storageId") { type = NavType.LongType })
+        ) { backStackEntry ->
+
+            val itemCategoryViewModel: ItemCategoryViewModel = koinViewModel()
+            val storageId = backStackEntry.arguments?.getLong("storageId") ?: 0L
+            val storageName = storages.find { it.id == storageId }?.title ?: ""
+
+            ItemCategoryScreen(
+                itemCategoryViewModel = itemCategoryViewModel,
+                storageId = storageId,
+                storageName = storageName,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

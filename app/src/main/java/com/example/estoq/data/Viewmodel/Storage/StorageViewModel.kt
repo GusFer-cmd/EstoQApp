@@ -4,22 +4,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.estoq.data.Exceptions.Storage.StorageException
+import com.example.estoq.data.Model.Client.Client
 import com.example.estoq.data.Model.Storage.Storage
 import com.example.estoq.data.Repository.Storage.StorageRepository
 import com.example.estoq.data.Ui_State.Storage.StorageUiState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StorageViewModel(
     private val repository: StorageRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StorageUiState())
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     val uiState: StateFlow<StorageUiState> = _uiState
 
+    val filteredStorages: Flow<List<Storage>> = _searchQuery.flatMapLatest { query ->
+        if (query.isBlank()) repository.getAll()
+        else repository.searchByTitle(query)
+    }
+
     val allStorages = repository.getAll()
+
+    fun onSearchQueryChange(value: String) {
+        _searchQuery.value = value
+    }
 
     fun onTitleChange(value: String) {
         _uiState.value = _uiState.value.copy(title = value, titleError = null)
@@ -81,7 +98,6 @@ class StorageViewModel(
     fun clearIsDeleted() {
         _uiState.value = _uiState.value.copy(isDeleted = false)
     }
-
 
     fun getById(id: Long) {
         viewModelScope.launch {

@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,19 +22,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -51,11 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.estoq.component.ClientCard
+import com.example.estoq.component.SearchBar
 import com.example.estoq.data.Viewmodel.Client.ClientSection
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import kotlinx.coroutines.launch
@@ -68,11 +65,13 @@ fun ClientScreen(
     onNavigateToUpdate: (Long) -> Unit,
     onNavigateToDetail: (Long) -> Unit
 ) {
-    val sections by clientViewModel.sections.collectAsState()
+    val sections by clientViewModel.sections.collectAsState(initial = emptyList())
     val state by clientViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    val focusManager = LocalFocusManager.current
 
     val searchQuery by clientViewModel.searchQuery.collectAsState()
 
@@ -151,42 +150,26 @@ fun ClientScreen(
                 .padding(padding)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures (
+                            onTap = {
+                                focusManager.clearFocus()
+                            }
+                        )
+                    }
             ) {
                 SnackbarHost(
                     hostState = snackbarHostState,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
-                OutlinedTextField(
+                SearchBar(
                     value = searchQuery,
                     onValueChange = { clientViewModel.onSearchQueryChange(it) },
-                    placeholder = { Text("Pesquisar cliente...") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null
-                        )
-                    },
-                    trailingIcon = if (searchQuery.isNotBlank()){
-                        {
-                            IconButton(onClick = { clientViewModel.onSearchQueryChange("") }) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Limpar pesquisa",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
-                    } else null,
-                    shape = RoundedCornerShape(16.dp),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp, vertical = 8.dp)
+                    placeholder = "Pesquisar cliente...",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
                 Box(

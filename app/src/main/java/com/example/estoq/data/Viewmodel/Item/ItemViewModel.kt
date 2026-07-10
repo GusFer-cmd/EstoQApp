@@ -8,12 +8,15 @@ import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Repository.Item.ItemRepository
 import com.example.estoq.data.Repository.Storage.StorageRepository
 import com.example.estoq.data.Ui_State.Item.ItemUiState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ItemViewModel(
     private val itemRepository: ItemRepository,
     private val storageRepository: StorageRepository
@@ -34,15 +37,12 @@ class ItemViewModel(
     val selectedTypeFilter: StateFlow<ItemType?> = _selectedTypeFilter
 
     val filteredItems: Flow<List<Item>> = combine(
-        _searchQuery, _selectedTypeFilter, allItems
-    ) { query, typeFilter, items ->
-        items.filter { item ->
-            val matchesQuery = query.isBlank() ||
-                    item.name.contains(query, ignoreCase = true) ||
-                    item.brand.contains(query, ignoreCase = true)
-            val matchesType = typeFilter == null || item.type == typeFilter
-            matchesQuery && matchesType
-        }
+        _searchQuery, _selectedTypeFilter
+    ) { query, typeFilter ->
+        query to typeFilter
+    }.flatMapLatest { (query, typeFilter) ->
+        if (query.isBlank() && typeFilter == null) itemRepository.getAll()
+        else itemRepository.searchByNameOrBrandAndType(query, typeFilter?.code)
     }
 
     fun onTypeFilterChange(type: ItemType?) {
@@ -99,9 +99,6 @@ class ItemViewModel(
     fun onSearchQueryChange(value: String) {
         _searchQuery.value = value
     }
-
-    fun searchByNameOrBrand(query: String): Flow<List<Item>> =
-        itemRepository.searchByNameOrBrand(query)
 
     fun resetState() {
         _uiState.value = ItemUiState()
