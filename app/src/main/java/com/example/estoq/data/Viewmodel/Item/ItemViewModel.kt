@@ -72,16 +72,13 @@ class ItemViewModel(
         _uiState.value = _uiState.value.copy(size = size, sizeError = null)
     }
 
+    fun onColorChange(color: String) {
+        _uiState.value = _uiState.value.copy(color = color, colorError = null)
+    }
+
     fun onPriceChange(value: String) {
         val digits = value.filter { it.isDigit() }
-            .trimStart('0')
-            .ifEmpty { "0" }
-        val padded = digits.padStart(3, '0')
-        val cents = padded.takeLast(2)
-        val reais = padded.dropLast(2)
-        val formattedReais = reais.reversed().chunked(3).joinToString(".").reversed()
-        val formatted = "$formattedReais,$cents"
-        _uiState.value = _uiState.value.copy(currentPrice = formatted, currentPriceError = null)
+        _uiState.value = _uiState.value.copy(currentPrice = digits, currentPriceError = null)
     }
 
     fun onQuantityChange(value: String) {
@@ -114,18 +111,16 @@ class ItemViewModel(
 
     private fun formatPrice(value: Double): String {
         val cents = (value * 100).toLong()
-        val digits = cents.toString().padStart(3, '0')
-        val centsStr = digits.takeLast(2)
-        val reais = digits.dropLast(2)
-        val formattedReais = reais.reversed().chunked(3).joinToString(".").reversed()
-        return "$formattedReais,$centsStr"
+        return cents.toString()
     }
 
     private fun parsePrice(value: String): Double {
-        val clean = value
-            .replace(".", "")
-            .replace(",", ".")
-        return clean.toDouble()
+        val digits = value.filter { it.isDigit() }
+        if (digits.isEmpty()) return 0.0
+        val padded = digits.padStart(3, '0')
+        val reais = padded.dropLast(2).toLongOrNull() ?: 0L
+        val cents = padded.takeLast(2).toLongOrNull() ?: 0L
+        return reais + cents / 100.0
     }
 
     fun getById(id: Long) {
@@ -144,6 +139,7 @@ class ItemViewModel(
                         storageId = item.storageId,
                         type = item.type,
                         size = item.size,
+                        color = item.color,
                         createdAt = item.createdAt,
                         isLoading = false
                     )
@@ -199,7 +195,8 @@ class ItemViewModel(
                         imagePath = state.imagePath,
                         storageId = state.storageId,
                         type = state.type,
-                        size = state.size
+                        size = state.size,
+                        color = state.color,
                     )
                 )
 
@@ -276,6 +273,7 @@ class ItemViewModel(
                         storageId = state.storageId,
                         type = state.type,
                         size = state.size,
+                        color = state.color,
                         createdAt = state.createdAt
                     )
                 )

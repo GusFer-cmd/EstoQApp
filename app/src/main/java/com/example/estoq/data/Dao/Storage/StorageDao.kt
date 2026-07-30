@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StorageDao {
 
-    @Query("SELECT * FROM Storage ORDER BY createdAt DESC")
+    @Query("SELECT * FROM Storage ORDER BY createdAt ASC")
     fun getAll(): Flow<List<Storage>>
 
     @Query("SELECT * FROM Storage WHERE title LIKE '%' || :query || '%' ORDER BY createdAt DESC")

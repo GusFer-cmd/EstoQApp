@@ -4,8 +4,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.estoq.component.Container
 import com.example.estoq.component.ItemGridCard
 import com.example.estoq.component.SearchBar
@@ -52,13 +54,29 @@ fun ItemCategoryScreen(
     val itemCount by itemCategoryViewModel.itemCount.collectAsState(initial = 0)
     val searchQuery by itemCategoryViewModel.searchQuery.collectAsState()
 
+
     val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("$storageName ($itemCount)")
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(end = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = storageName
+                        )
+
+                        Text(
+                            text = "$itemCount produto(s)",
+                            fontSize = 14.sp
+                        )
+
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -75,6 +93,7 @@ fun ItemCategoryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
+                .consumeWindowInsets(padding)
         ) {
             Column(
                 modifier = Modifier

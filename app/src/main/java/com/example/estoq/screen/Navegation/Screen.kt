@@ -36,6 +36,11 @@ sealed class Screen(
     }
 
     object SalesIndex : Screen("sales/index")
+    object SaleArchiveCreate : Screen("sale/create")
+    object SaleArchiveDetail : Screen("sale/detail/{id}") {
+        fun createRoute(id: Long) = "sale/detail/$id"
+    }
+
 }
 
 data class BottomNavItem(

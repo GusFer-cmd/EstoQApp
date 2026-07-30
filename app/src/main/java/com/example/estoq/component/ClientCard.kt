@@ -17,8 +17,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -116,7 +119,7 @@ fun ClientCard(
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar", color = Color.Black)
+                        Text("Deletar", color = Color.White)
                     }
                 }
             }
@@ -127,81 +130,113 @@ fun ClientCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "${client.firstName} ${client.lastName}".trim(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = client.telephone,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp
-                )
-            }
-
+        Column {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick() }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = onEditClick,
+                Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.Blue)
-                        .padding(10.dp, 10.dp)
-                        .size(24.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar",
-                        tint = Color.White,
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
-                IconButton(
-                    onClick = { showDialog.value = true },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.Red)
-                        .padding(10.dp, 10.dp)
-                        .size(24.dp)
+                Spacer(Modifier.width(12.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Deletar",
-                        tint = Color.White,
+                    Text(
+                        text = "${client.firstName} ${client.lastName}".trim(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
+
+                    Spacer(Modifier.height(2.dp))
+
+                    val regexTelephone = """(\d{2})(\d{1})(\d{4})(\d{4})""".toRegex()
+                    val formatTelephone = regexTelephone.replace(client.telephone, "($1) $2 $3-$4")
+
+                    Row (
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Phone,
+                            contentDescription = "Telefone",
+                            modifier = Modifier.size(14.dp)
+                        )
+
+                        Spacer(Modifier.width(6.dp))
+
+                        Text(
+                            text = formatTelephone,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        ClientButtons(
+                            color = Color(0xFF4382DF),
+                            onAction = { onEditClick() },
+                            icon = Icons.Default.Edit,
+                            description = "Editar"
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        ClientButtons(
+                            color = Color(0xFFDC0000),
+                            onAction = { showDialog.value = true },
+                            icon = Icons.Default.DeleteForever,
+                            description = "Excluir"
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ClientButtons(
+    color: Color,
+    onAction: () -> Unit,
+    icon: ImageVector,
+    description: String
+) {
+    IconButton(
+        onClick = { onAction() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(color)
+            .padding(horizontal = 18.dp, vertical = 5.dp)
+            .size(20.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+        )
     }
 }

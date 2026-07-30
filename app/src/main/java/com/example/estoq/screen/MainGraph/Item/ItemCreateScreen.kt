@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.estoq.component.Container
+import com.example.estoq.component.CurrencyVisualTransformation
 import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Model.Storage.Storage
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
@@ -87,11 +88,15 @@ fun ItemCreateScreen(
     val state by itemViewModel.uiState.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    val selectedStorage = availableStorages.find { it.id == state.storageId }
-
     var typeExpanded by remember { mutableStateOf(false) }
     var sizeExpanded by remember { mutableStateOf(false) }
+    var colorExpanded by remember { mutableStateOf(false) }
+
+    val selectedStorage = availableStorages.find { it.id == state.storageId }
+
     val availableSizes = remember(state.type) { state.type.availableSizes() }
+
+    val availableColors = remember(state.color) { state.type.availableColors() }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -317,6 +322,50 @@ fun ItemCreateScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Text(
+                        text = "Cor",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    ExposedDropdownMenuBox(
+                        expanded = colorExpanded,
+                        onExpandedChange = { colorExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = state.color,
+                            onValueChange = {},
+                            readOnly = true,
+                            isError = state.colorError != null,
+                            placeholder = { Text("Selecione uma cor") },
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                            singleLine = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sizeExpanded) }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = colorExpanded,
+                            onDismissRequest = { colorExpanded = false }
+                        ) {
+                            availableColors.forEach { color ->
+                                DropdownMenuItem(
+                                    text = { Text(color) },
+                                    onClick = {
+                                        itemViewModel.onColorChange(color)
+                                        colorExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
                         text = "Preço",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
@@ -328,11 +377,12 @@ fun ItemCreateScreen(
                         value = state.currentPrice,
                         onValueChange = { itemViewModel.onPriceChange(it) },
                         isError = state.currentPriceError != null,
-                        placeholder = { Text("") },
+                        placeholder = { Text("0") },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        visualTransformation = CurrencyVisualTransformation()
                     )
 
                     state.currentPriceError?.let {

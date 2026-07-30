@@ -1,6 +1,7 @@
 package com.example.estoq.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,18 +13,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +57,7 @@ import java.util.Locale
 fun ItemCard(
     item: Item,
     storageName: String,
+    storageColor: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -61,7 +68,6 @@ fun ItemCard(
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
             shape = RoundedCornerShape(20.dp),
-
             title = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,7 +131,7 @@ fun ItemCard(
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar")
+                        Text("Deletar", color = Color.White)
                     }
                 }
             }
@@ -140,16 +146,15 @@ fun ItemCard(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(460.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
+                    .wrapContentHeight()
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
             ) {
                 if (!item.imagePath.isNullOrBlank()) {
@@ -157,9 +162,8 @@ fun ItemCard(
                         model = item.imagePath,
                         contentDescription = "Foto do item",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                        contentScale = ContentScale.Crop
+                            .fillMaxSize(),
+                        contentScale = ContentScale.FillHeight
                     )
                 } else {
                     Box(
@@ -178,131 +182,212 @@ fun ItemCard(
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .weight(1f)
+                    .wrapContentHeight()
+                    .padding(horizontal = 12.dp, vertical = 5.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Column {
                     Text(
                         text = item.name,
-                        modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        maxLines = 2,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 18.sp
                     )
 
+                    Spacer(Modifier.height(2.dp))
+
+                    Text(
+                        text = item.brand,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 12.sp
+                    )
+                }
+
+                Spacer(Modifier.height(6.dp))
+
+                Column {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = onEditClick,
+                        Text(
+                            text = item.currentPrice.let { priceFormat.format(it) } ?: "—",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(6.dp))
+
+                HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+
+                Spacer(Modifier.height(15.dp))
+
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color.Blue)
-                                .size(40.dp)
+                                .border(1.dp, Color.White, RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Editar",
-                                tint = Color.White
+                            Text(
+                                text = item.size,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
-                        IconButton(
-                            onClick = { showDialog.value = true },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color.Red)
-                                .size(40.dp)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Deletar",
-                                tint = Color.White
-                            )
+                            if (item.stockQuantity > 5) {
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircleOutline,
+                                    contentDescription = "Icone de status de estoque",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = Color.Green
+                                )
+
+                                Text(
+                                    text = "${item.stockQuantity} unidades",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.WarningAmber,
+                                    contentDescription = "Icone de status de estoque",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = Color.Red
+                                )
+
+                                Text(
+                                    text = "${item.stockQuantity} unidades",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp,
+                                    color = Color.Red,
+                                    maxLines = 1
+                                )
+                            }
                         }
                     }
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(15.dp))
 
-                Text(
-                    text = item.brand,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 16.sp
-                )
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Cor: ${storageColor}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
 
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(15.dp))
 
-                Text(
-                    text = "${item.type.displayName} - ${item.size}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    maxLines = 1,
-                    fontSize = 14.sp
-                )
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Inventory,
+                            contentDescription = "Caixa de estoque",
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
 
-                Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = storageName,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
 
-                Text(
-                    text = item.currentPrice.let { priceFormat.format(it) } ?: "—",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Spacer(Modifier.height(18.dp))
 
-                Spacer(Modifier.height(6.dp))
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            ItemButtons(
+                                color = Color(0xFF4382DF),
+                                onAction = { onEditClick() },
+                                icon = Icons.Default.Edit,
+                                description = "Editar"
+                            )
+                        }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircleOutline,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(Modifier.width(4.dp))
-
-                    Text(
-                        text = "${item.stockQuantity} unidades",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
-                    )
-
-                    Spacer(Modifier.width(10.dp))
-
-                    Icon(
-                        imageVector = Icons.Default.Inventory,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(Modifier.width(4.dp))
-
-                    Text(
-                        text = storageName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                        Column {
+                            ItemButtons(
+                                color = Color(0xFFDC0000),
+                                onAction = { showDialog.value = true },
+                                icon = Icons.Default.DeleteForever,
+                                description = "Excluir"
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun ItemButtons(
+    color: Color,
+    onAction: () -> Unit,
+    icon: ImageVector,
+    description: String
+) {
+    IconButton(
+        onClick = { onAction() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color)
+            .padding(horizontal = 25.dp, vertical = 5.dp)
+            .size(20.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+        )
     }
 }

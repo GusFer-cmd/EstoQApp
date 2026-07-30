@@ -1,7 +1,6 @@
 package com.example.estoq.data.Dao.Item
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -24,12 +23,21 @@ interface ItemDao {
     @Query("SELECT * FROM Item WHERE storageId = :storageId ORDER BY createdAt DESC")
     fun getByStorageId(storageId: Long): Flow<List<Item>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item: Item): Long
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(item: Item)
 
     @Update
     suspend fun update(item: Item)
 
     @Query("DELETE FROM Item WHERE id = :id")
     suspend fun delete(id: Long)
+
+    @Query("UPDATE Item SET stockQuantity = stockQuantity - :quantity WHERE id = :id")
+    suspend fun decrementStock(id: Long, quantity: Int)
+
+    @Query("UPDATE Item SET stockQuantity = stockQuantity + :quantity WHERE id = :id")
+    suspend fun incrementStock(id: Long, quantity: Int)
+
+    @Query("SELECT * FROM Item WHERE stockQuantity <= :threshold ORDER BY stockQuantity ASC")
+    fun getLowStockItems(threshold: Int): Flow<List<Item>>
 }

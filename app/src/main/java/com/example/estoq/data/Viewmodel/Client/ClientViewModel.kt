@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.estoq.data.Exceptions.Client.ClientException
 import com.example.estoq.data.Model.Client.Client
 import com.example.estoq.data.Repository.Client.ClientRepository
+import com.example.estoq.data.Repository.Network.AddressRepository
 import com.example.estoq.data.Ui_State.Client.ClientUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +22,8 @@ data class ClientSection(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ClientViewModel(
-    private val clientRepository: ClientRepository
+    private val clientRepository: ClientRepository,
+    private val addressRepository: AddressRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ClientUiState())
@@ -60,6 +62,44 @@ class ClientViewModel(
         _uiState.value = _uiState.value.copy(telephone = value, telephoneError = null)
     }
 
+    fun onCepChange(value: String) {
+        val digits = value.filter { it.isDigit() }.take(8)
+        _uiState.value = _uiState.value.copy(cep = digits, cepError = null)
+        if (digits.length == 8) {
+            fetchAddress(digits)
+        }
+    }
+
+    fun onNumeroChange(value: String) {
+        _uiState.value = _uiState.value.copy(numero = value, numeroError = null)
+    }
+
+    private fun fetchAddress(cep: String) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isAddressLoading = true)
+                val address = addressRepository.findAddress(cep)
+                _uiState.value = _uiState.value.copy(
+                    logradouro = address.logradouro,
+                    bairro = address.bairro,
+                    cidade = address.cidade,
+                    estado = address.estado,
+                    isAddressLoading = false
+                )
+            } catch (e: ClientException) {
+                _uiState.value = _uiState.value.copy(
+                    isAddressLoading = false,
+                    cepError = e.message
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isAddressLoading = false,
+                    cepError = "Erro ao buscar CEP"
+                )
+            }
+        }
+    }
+
     fun resetState() {
         _uiState.value = ClientUiState()
     }
@@ -89,6 +129,12 @@ class ClientViewModel(
                         firstName = client.firstName,
                         lastName = client.lastName,
                         telephone = client.telephone,
+                        cep = client.cep,
+                        logradouro = client.logradouro,
+                        bairro = client.bairro,
+                        cidade = client.cidade,
+                        estado = client.estado,
+                        numero = client.numero,
                         isLoading = false
                     )
                 } else {
@@ -122,6 +168,12 @@ class ClientViewModel(
                 if (state.telephone.isBlank()) {
                     throw ClientException.EmptyTelephone()
                 }
+                if (state.cep.isBlank()) {
+                    throw ClientException.EmptyCep()
+                }
+                if (state.numero.isBlank()) {
+                    throw ClientException.EmptyNumero()
+                }
 
                 _uiState.value = state.copy(isLoading = true)
 
@@ -129,7 +181,13 @@ class ClientViewModel(
                     Client(
                         firstName = state.firstName.trim(),
                         lastName = state.lastName.trim(),
-                        telephone = state.telephone.trim()
+                        telephone = state.telephone.trim(),
+                        cep = state.cep.trim(),
+                        logradouro = state.logradouro.trim(),
+                        bairro = state.bairro.trim(),
+                        cidade = state.cidade.trim(),
+                        estado = state.estado.trim(),
+                        numero = state.numero.trim()
                     )
                 )
 
@@ -147,6 +205,12 @@ class ClientViewModel(
                         _uiState.value.copy(lastNameError = e.message)
                     is ClientException.EmptyTelephone ->
                         _uiState.value.copy(telephoneError = e.message)
+                    is ClientException.EmptyCep ->
+                        _uiState.value.copy(cepError = e.message)
+                    is ClientException.InvalidCep ->
+                        _uiState.value.copy(cepError = e.message)
+                    is ClientException.EmptyNumero ->
+                        _uiState.value.copy(numeroError = e.message)
                     else -> _uiState.value.copy(error = e.message)
                 }
             } catch (e: Exception) {
@@ -175,6 +239,12 @@ class ClientViewModel(
                 if (state.telephone.isBlank()) {
                     throw ClientException.EmptyTelephone()
                 }
+                if (state.cep.isBlank()) {
+                    throw ClientException.EmptyCep()
+                }
+                if (state.numero.isBlank()) {
+                    throw ClientException.EmptyNumero()
+                }
 
                 _uiState.value = state.copy(isLoading = true)
 
@@ -183,7 +253,13 @@ class ClientViewModel(
                         id = state.id,
                         firstName = state.firstName.trim(),
                         lastName = state.lastName.trim(),
-                        telephone = state.telephone.trim()
+                        telephone = state.telephone.trim(),
+                        cep = state.cep.trim(),
+                        logradouro = state.logradouro.trim(),
+                        bairro = state.bairro.trim(),
+                        cidade = state.cidade.trim(),
+                        estado = state.estado.trim(),
+                        numero = state.numero.trim()
                     )
                 )
 
@@ -201,6 +277,12 @@ class ClientViewModel(
                         _uiState.value.copy(lastNameError = e.message)
                     is ClientException.EmptyTelephone ->
                         _uiState.value.copy(telephoneError = e.message)
+                    is ClientException.EmptyCep ->
+                        _uiState.value.copy(cepError = e.message)
+                    is ClientException.InvalidCep ->
+                        _uiState.value.copy(cepError = e.message)
+                    is ClientException.EmptyNumero ->
+                        _uiState.value.copy(numeroError = e.message)
                     else -> _uiState.value.copy(error = e.message)
                 }
             } catch (e: Exception) {

@@ -14,6 +14,7 @@ import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemCategoryViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
+import com.example.estoq.data.Viewmodel.SaleArchive.SaleArchiveViewModel
 import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
 import com.example.estoq.screen.AuthGraph.LoginScreen
 import com.example.estoq.screen.AuthGraph.RegisterScreen
@@ -26,6 +27,9 @@ import com.example.estoq.screen.MainGraph.Item.ItemCategoryScreen
 import com.example.estoq.screen.MainGraph.Item.ItemCreateScreen
 import com.example.estoq.screen.MainGraph.Item.ItemScreen
 import com.example.estoq.screen.MainGraph.Item.ItemUpdateScreen
+import com.example.estoq.screen.MainGraph.SaleArchive.SaleArchiveCreateScreen
+import com.example.estoq.screen.MainGraph.SaleArchive.SaleArchiveDetailScreen
+import com.example.estoq.screen.MainGraph.SaleArchive.SaleArchiveScreen
 import com.example.estoq.screen.MainGraph.Storage.StorageCreateScreen
 import com.example.estoq.screen.MainGraph.Storage.StorageScreen
 import com.example.estoq.screen.MainGraph.Storage.StorageUpdateScreen
@@ -39,9 +43,11 @@ fun AppNavGraph(
     val storageViewModel: StorageViewModel = koinViewModel()
     val itemViewModel: ItemViewModel = koinViewModel()
     val clientViewModel: ClientViewModel = koinViewModel()
+    val saleArchiveViewModel: SaleArchiveViewModel = koinViewModel()
     val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
     val items by itemViewModel.allItems.collectAsState(initial = emptyList())
     val clients by clientViewModel.allClients.collectAsState(initial = emptyList())
+    val sales by saleArchiveViewModel.allSales.collectAsState(initial = emptyList())
 
     NavHost(
         navController = navController,
@@ -128,6 +134,7 @@ fun AppNavGraph(
                 totalStorages = storages.size,
                 totalItems = items.size,
                 totalClients = clients.size,
+                totalSales =  sales.size,
                 onLogout = {
                     navController.navigate(
                         Screen.Login.route
@@ -290,6 +297,42 @@ fun AppNavGraph(
             ClientDetailScreen(
                 id = id,
                 clientViewModel = clientViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.SalesIndex.route) {
+            SaleArchiveScreen(
+                saleArchiveViewModel = saleArchiveViewModel,
+                onNavigateToCreate = {
+                    saleArchiveViewModel.resetState()
+                    navController.navigate(Screen.SaleArchiveCreate.route)
+                },
+                onNavigateToDetail = { id ->
+                    navController.navigate(Screen.SaleArchiveDetail.createRoute(id))
+                }
+            )
+        }
+
+        composable(Screen.SaleArchiveCreate.route) {
+            SaleArchiveCreateScreen(
+                saleArchiveViewModel = saleArchiveViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.SaleArchiveDetail.route,
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getLong("id") ?: 0L
+            SaleArchiveDetailScreen(
+                id = id,
+                saleArchiveViewModel = saleArchiveViewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

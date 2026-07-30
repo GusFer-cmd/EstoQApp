@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.estoq.component.Container
+import com.example.estoq.component.CurrencyVisualTransformation
 import com.example.estoq.data.Model.Item.ItemType
 import com.example.estoq.data.Model.Storage.Storage
 import com.example.estoq.data.Viewmodel.Item.ItemViewModel
@@ -87,11 +88,15 @@ fun ItemUpdateScreen(
     val state by itemViewModel.uiState.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
-    val selectedStorage = availableStorages.find { it.id == state.storageId }
-
     var typeExpanded by remember { mutableStateOf(false) }
     var sizeExpanded by remember { mutableStateOf(false) }
+    var colorExpanded by remember { mutableStateOf(false) }
+
+    val selectedStorage = availableStorages.find { it.id == state.storageId }
+
     val availableSizes = remember(state.type) { state.type.availableSizes() }
+
+    val availableColors = remember(state.color) { state.type.availableColors() }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -231,165 +236,10 @@ fun ItemUpdateScreen(
                             )
                         }
 
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(
-                        text = "Tipo",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    ExposedDropdownMenuBox(
-                        expanded = typeExpanded,
-                        onExpandedChange = { typeExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = state.type.displayName,
-                            onValueChange = {},
-                            readOnly = true,
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
-                            singleLine = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) }
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = typeExpanded,
-                            onDismissRequest = { typeExpanded = false }
-                        ) {
-                            ItemType.entries.forEach { itemType ->
-                                DropdownMenuItem(
-                                    text = { Text(itemType.displayName) },
-                                    onClick = {
-                                        itemViewModel.onTypeChange(itemType)
-                                        typeExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(
-                        text = "Tamanho",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    ExposedDropdownMenuBox(
-                        expanded = sizeExpanded,
-                        onExpandedChange = { sizeExpanded = it }
-                    ) {
-                        OutlinedTextField(
-                            value = state.size,
-                            onValueChange = {},
-                            readOnly = true,
-                            isError = state.sizeError != null,
-                            placeholder = { Text("Selecione um tamanho") },
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
-                            singleLine = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sizeExpanded) }
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = sizeExpanded,
-                            onDismissRequest = { sizeExpanded = false }
-                        ) {
-                            availableSizes.forEach { size ->
-                                DropdownMenuItem(
-                                    text = { Text(size) },
-                                    onClick = {
-                                        itemViewModel.onSizeChange(size)
-                                        sizeExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    state.sizeError?.let {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                        )
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(
-                        text = "Preço",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = state.currentPrice,
-                            onValueChange = { itemViewModel.onPriceChange(it) },
-                            isError = state.currentPriceError != null,
-                            placeholder = { Text("") },
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
-                        state.currentPriceError?.let {
-                            Text(
-                                text = it,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                            )
-                        }
-
                         Spacer(Modifier.height(16.dp))
 
                         Text(
-                            text = "Quantidade em Estoque",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        OutlinedTextField(
-                            value = state.stockQuantity,
-                            onValueChange = { itemViewModel.onQuantityChange(it) },
-                            isError = state.stockQuantityError != null,
-                            placeholder = { Text("0") },
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-
-                        state.stockQuantityError?.let {
-                            Text(
-                                text = it,
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                            )
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Text(
-                            text = "Estoque",
+                            text = "Tipo",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -397,40 +247,82 @@ fun ItemUpdateScreen(
                         Spacer(Modifier.height(8.dp))
 
                         ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = { expanded = it }
+                            expanded = typeExpanded,
+                            onExpandedChange = { typeExpanded = it }
                         ) {
                             OutlinedTextField(
-                                value = selectedStorage?.title ?: "",
+                                value = state.type.displayName,
                                 onValueChange = {},
                                 readOnly = true,
-                                isError = state.storageIdError != null,
-                                placeholder = { Text("Selecione um estoque") },
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
                                 singleLine = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) }
                             )
 
                             ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
+                                expanded = typeExpanded,
+                                onDismissRequest = { typeExpanded = false }
                             ) {
-                                availableStorages.forEach { storage ->
+                                ItemType.entries.forEach { itemType ->
                                     DropdownMenuItem(
-                                        text = { Text(storage.title) },
+                                        text = { Text(itemType.displayName) },
                                         onClick = {
-                                            itemViewModel.onStorageChange(storage.id)
-                                            expanded = false
+                                            itemViewModel.onTypeChange(itemType)
+                                            typeExpanded = false
                                         }
                                     )
                                 }
                             }
                         }
 
-                        state.storageIdError?.let {
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "Tamanho",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        ExposedDropdownMenuBox(
+                            expanded = sizeExpanded,
+                            onExpandedChange = { sizeExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = state.size,
+                                onValueChange = {},
+                                readOnly = true,
+                                isError = state.sizeError != null,
+                                placeholder = { Text("Selecione um tamanho") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                singleLine = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sizeExpanded) }
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = sizeExpanded,
+                                onDismissRequest = { sizeExpanded = false }
+                            ) {
+                                availableSizes.forEach { size ->
+                                    DropdownMenuItem(
+                                        text = { Text(size) },
+                                        onClick = {
+                                            itemViewModel.onSizeChange(size)
+                                            sizeExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        state.sizeError?.let {
                             Text(
                                 text = it,
                                 color = MaterialTheme.colorScheme.error,
@@ -442,109 +334,267 @@ fun ItemUpdateScreen(
                         Spacer(Modifier.height(16.dp))
 
                         Text(
-                            text = "Foto",
+                            text = "Cor",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Spacer(Modifier.height(8.dp))
 
-                        if (state.imagePath.isNullOrBlank()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(16f / 9f)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                                    .clickable { takePhoto() },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CameraAlt,
-                                        contentDescription = "Tirar foto",
-                                        modifier = Modifier.size(40.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Spacer(Modifier.height(8.dp))
-                                    Text(
-                                        text = "Adicionar foto",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(1.dp, Color.LightGray, shape = RoundedCornerShape(16.dp))
-                            ) {
-                                AsyncImage(
-                                    model = state.imagePath,
-                                    contentDescription = "Foto do item",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
-                                        .clip(RoundedCornerShape(16.dp)),
-                                    contentScale = ContentScale.Fit
-                                )
-                                IconButton(
-                                    onClick = {
-                                        itemViewModel.onImagePathChange(null)
-                                    },
-                                    modifier = Modifier
-                                        .align(Alignment.TopEnd)
-                                        .padding(4.dp)
-                                        .size(32.dp)
-                                        .background(
-                                            color = Color.Black.copy(alpha = 0.5f),
-                                            shape = CircleShape
-                                        )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = "Remover foto",
-                                        tint = Color.White,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(24.dp))
-
-                        Button(
-                            onClick = { itemViewModel.updateItem() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Green
-                            )
+                        ExposedDropdownMenuBox(
+                            expanded = colorExpanded,
+                            onExpandedChange = { colorExpanded = it }
                         ) {
-                            Text(
-                                text = "Salvar",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                            OutlinedTextField(
+                                value = state.color,
+                                onValueChange = {},
+                                readOnly = true,
+                                isError = state.colorError != null,
+                                placeholder = { Text("Selecione uma cor") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                singleLine = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sizeExpanded) }
                             )
+
+                            ExposedDropdownMenu(
+                                expanded = colorExpanded,
+                                onDismissRequest = { colorExpanded = false }
+                            ) {
+                                availableColors.forEach { color ->
+                                    DropdownMenuItem(
+                                        text = { Text(color) },
+                                        onClick = {
+                                            itemViewModel.onColorChange(color)
+                                            colorExpanded = false
+                                        }
+                                    )
+                                }
+                            }
                         }
 
                         Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "Preço",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        OutlinedTextField(
+                            value = state.currentPrice,
+                                onValueChange = { itemViewModel.onPriceChange(it) },
+                                isError = state.currentPriceError != null,
+                                placeholder = { Text("0") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                visualTransformation = CurrencyVisualTransformation()
+                            )
+
+                            state.currentPriceError?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            Text(
+                                text = "Quantidade em Estoque",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            OutlinedTextField(
+                                value = state.stockQuantity,
+                                onValueChange = { itemViewModel.onQuantityChange(it) },
+                                isError = state.stockQuantityError != null,
+                                placeholder = { Text("0") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            )
+
+                            state.stockQuantityError?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            Text(
+                                text = "Estoque",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            ExposedDropdownMenuBox(
+                                expanded = expanded,
+                                onExpandedChange = { expanded = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedStorage?.title ?: "",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    isError = state.storageIdError != null,
+                                    placeholder = { Text("Selecione um estoque") },
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                    singleLine = true,
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                                )
+
+                                ExposedDropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    availableStorages.forEach { storage ->
+                                        DropdownMenuItem(
+                                            text = { Text(storage.title) },
+                                            onClick = {
+                                                itemViewModel.onStorageChange(storage.id)
+                                                expanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            state.storageIdError?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            Text(
+                                text = "Foto",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            if (state.imagePath.isNullOrBlank()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(16f / 9f)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                                        .clickable { takePhoto() },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CameraAlt,
+                                            contentDescription = "Tirar foto",
+                                            modifier = Modifier.size(40.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(Modifier.height(8.dp))
+                                        Text(
+                                            text = "Adicionar foto",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, Color.LightGray, shape = RoundedCornerShape(16.dp))
+                                ) {
+                                    AsyncImage(
+                                        model = state.imagePath,
+                                        contentDescription = "Foto do item",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(16f / 9f)
+                                            .clip(RoundedCornerShape(16.dp)),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    IconButton(
+                                        onClick = {
+                                            itemViewModel.onImagePathChange(null)
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(4.dp)
+                                            .size(32.dp)
+                                            .background(
+                                                color = Color.Black.copy(alpha = 0.5f),
+                                                shape = CircleShape
+                                            )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Remover foto",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(Modifier.height(24.dp))
+
+                            Button(
+                                onClick = { itemViewModel.updateItem() },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Green
+                                )
+                            ) {
+                                Text(
+                                    text = "Salvar",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black,
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+                        }
                     }
-                }
             }
-        }
+         }
     }
 }
 

@@ -23,7 +23,7 @@ class ItemRepository(private val itemDao: ItemDao) {
         }
     }
 
-    suspend fun insert(item: Item): Long {
+    suspend fun insert(item: Item) {
         return try {
             itemDao.insert(item)
         } catch (e: Exception) {
@@ -46,4 +46,23 @@ class ItemRepository(private val itemDao: ItemDao) {
             throw ItemException.ItemUnknownException()
         }
     }
+
+    suspend fun decrementStock(id: Long, quantity: Int) {
+        try {
+            itemDao.decrementStock(id, quantity)
+        } catch (e: Exception) {
+            throw ItemException.ItemUnknownException()
+        }
+    }
+
+    suspend fun incrementStock(id: Long, quantity: Int) {
+        try {
+            itemDao.incrementStock(id, quantity)
+        } catch (e: Exception) {
+            throw ItemException.ItemUnknownException()
+        }
+    }
+
+    fun getLowStockItems(threshold: Int): Flow<List<Item>> =
+        itemDao.getLowStockItems(threshold)
 }

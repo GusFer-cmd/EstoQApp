@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -101,14 +104,20 @@ fun ClientScreen(
 
     LaunchedEffect(state.isDeleted) {
         if (state.isDeleted) {
-            snackbarHostState.showSnackbar("Cliente deletado com sucesso!")
+            snackbarHostState.showSnackbar(
+                message = "Cliente deletado com sucesso!",
+                duration = SnackbarDuration.Short
+            )
             clientViewModel.clearIsDeleted()
         }
     }
 
     LaunchedEffect(state.isUpdated) {
         if (state.isUpdated) {
-            snackbarHostState.showSnackbar("Cliente atualizado com sucesso!")
+            snackbarHostState.showSnackbar(
+                message = "Cliente atualizado com sucesso!",
+                duration = SnackbarDuration.Short
+            )
             clientViewModel.clearIsUpdated()
         }
     }
@@ -147,7 +156,8 @@ fun ClientScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
+                .consumeWindowInsets(padding)
         ) {
             Column(
                 modifier = Modifier
@@ -162,7 +172,21 @@ fun ClientScreen(
             ) {
                 SnackbarHost(
                     hostState = snackbarHostState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    snackbar = { snackbarData ->
+                        val backgroundColor = when {
+                            snackbarData.visuals.message.contains("sucesso", ignoreCase = true) ->
+                                Color(0xFF2B5748)
+                            else ->
+                                Color(0xFF95271D)
+                        }
+
+                        Snackbar(
+                            snackbarData = snackbarData,
+                            containerColor = backgroundColor,
+                            contentColor = Color.White,
+                        )
+                    }
                 )
 
                 SearchBar(

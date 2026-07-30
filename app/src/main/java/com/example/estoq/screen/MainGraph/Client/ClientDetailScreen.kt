@@ -3,6 +3,7 @@ package com.example.estoq.screen.MainGraph.Client
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,12 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.estoq.R
+import com.example.estoq.component.DetailRow
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +80,7 @@ fun ClientDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
                 .consumeWindowInsets(padding)
         ) {
             if (state.isLoading) {
@@ -92,7 +94,7 @@ fun ClientDetailScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp, vertical = 32.dp),
+                        .padding(horizontal = 20.dp, vertical = 19.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Card(
@@ -146,31 +148,6 @@ fun ClientDetailScreen(
                                     )
                                 }
                             }
-
-                            Spacer(Modifier.height(24.dp))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 24.dp, vertical = 16.dp)
-                            ) {
-                                Text(
-                                    text = "Telefone",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontWeight = FontWeight.Medium
-                                )
-
-                                Spacer(Modifier.height(4.dp))
-
-                                Text(
-                                    text = state.telephone,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Spacer(Modifier.height(16.dp))
                         }
                     }
 
@@ -199,71 +176,66 @@ fun ClientDetailScreen(
 
                             DetailRow(
                                 label = "Nome",
-                                value = state.firstName
+                                value = "${state.firstName} ${state.lastName}".trim()
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            val regexTelephone = """(\d{2})(\d{1})(\d{4})(\d{4})""".toRegex()
+                            val formatTelephone = regexTelephone.replace(state.telephone, "($1) $2 $3-$4")
+
+                            DetailRow(
+                                label = "Telefone",
+                                value = formatTelephone
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f)
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            val regexCep = """(\d{5})(\d{3})""".toRegex()
+                            val formatCep = regexCep.replace(state.cep, "$1-$2")
+
+                            val fullTitle = buildString {
+                                append("Endereço")
+                                if (state.cep.isNotBlank()) append(" - ${formatCep}")
+                            }
+
+                            Text(
+                                text = fullTitle,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+
+                            Spacer(Modifier.height(12.dp))
+
+                            DetailRow(
+                                label = "Logradouro",
+                                value = "${state.logradouro} - ${state.numero}".trim()
                             )
 
                             Spacer(Modifier.height(8.dp))
 
                             DetailRow(
-                                label = "Sobrenome",
-                                value = state.lastName
+                                label = "Bairro",
+                                value = state.bairro
                             )
 
                             Spacer(Modifier.height(8.dp))
 
-                            Text(
-                                text = "Compras do Cliente",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                                fontSize = 12.sp
+                            DetailRow(
+                                label = "Cidade",
+                                value = "${state.cidade}/${state.estado}"
                             )
-
-                            Spacer(Modifier.height(4.dp))
-
-                            IconButton(
-                                onClick = { },
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.Green)
-                                    .padding(18.dp, 10.dp)
-                                    .size(24.dp)
-
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.ShoppingBag,
-                                    contentDescription = "Sacola de compras"
-                                )
-                            }
                         }
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun DetailRow(
-    label: String,
-    value: String
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-            fontSize = 12.sp
-        )
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
     }
 }

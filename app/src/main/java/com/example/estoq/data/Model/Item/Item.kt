@@ -15,5 +15,6 @@ data class Item(
     val storageId: Long,
     val type: ItemType = ItemType.BLUSA,
     val size: String = "",
+    val color: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )

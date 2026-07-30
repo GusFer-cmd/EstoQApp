@@ -68,6 +68,10 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.7.0") // Coil
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0") // Logs
+    implementation("com.squareup.retrofit2:retrofit:2.9.0") // Retrofit
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Gson
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

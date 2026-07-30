@@ -27,6 +27,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -75,14 +77,20 @@ fun ItemScreen(
 
     LaunchedEffect(state.isDeleted) {
         if (state.isDeleted) {
-            snackbarHostState.showSnackbar("Item deletado com sucesso!")
+            snackbarHostState.showSnackbar(
+                message = "Item deletado com sucesso!",
+                duration = SnackbarDuration.Short
+            )
             itemViewModel.clearIsDeleted()
         }
     }
 
     LaunchedEffect(state.isUpdated) {
         if (state.isUpdated) {
-            snackbarHostState.showSnackbar("Item atualizado com sucesso!")
+            snackbarHostState.showSnackbar(
+                message = "Item atualizado com sucesso!",
+                duration = SnackbarDuration.Short
+            )
             itemViewModel.clearIsUpdated()
         }
     }
@@ -122,6 +130,7 @@ fun ItemScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
+                .consumeWindowInsets(padding)
         ) {
             Column(
                 modifier = Modifier
@@ -136,7 +145,21 @@ fun ItemScreen(
             ) {
                 SnackbarHost(
                     hostState = snackbarHostState,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    snackbar = { snackbarData ->
+                        val backgroundColor = when {
+                            snackbarData.visuals.message.contains("sucesso", ignoreCase = true) ->
+                                Color(0xFF2B5748)
+                            else ->
+                                Color(0xFF95271D)
+                        }
+
+                        Snackbar(
+                            snackbarData = snackbarData,
+                            containerColor = backgroundColor,
+                            contentColor = Color.White,
+                        )
+                    }
                 )
 
                 SearchBar(
@@ -197,6 +220,7 @@ fun ItemScreen(
                                     ItemCard(
                                         item = item,
                                         storageName = storageMap[item.storageId] ?: "Desconhecido",
+                                        storageColor = item.color,
                                         onEditClick = { onNavigateToUpdate(item.id) },
                                         onDeleteClick = { itemViewModel.deleteItem(item.id) }
                                     )

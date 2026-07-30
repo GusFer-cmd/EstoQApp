@@ -17,12 +17,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -127,106 +130,138 @@ fun StorageCard(
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar", color = Color.Black)
+                        Text("Deletar", color = Color.White)
                     }
                 }
             }
         )
     }
 
-    val dateFormat = remember {
-        SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault())
-    }
-
     Card(
-        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable{ onNavigateToItemStorage() }
+            .clickable{ onNavigateToItemStorage() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(storage.mainColor.toInt())
+        ),
+        shape = RoundedCornerShape(30.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Row(
             modifier = Modifier
-            .fillMaxWidth()
+                .fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier
-                    .width(20.dp)
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp))
-                    .background(Color(storage.mainColor.toInt()))
-            )
-            Row(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .weight(1f),
+            Row( modifier = Modifier
+                .padding(top = 14.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                Column(modifier = Modifier
-                    .weight(1f)) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Box (
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(25.dp))
+                                .background(Color.Black)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = "Estoque ${storage.id}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                            }
+                        }
+
+                        Icon(
+                            imageVector = Icons.Default.Inventory,
+                            contentDescription = "Caixa de estoque",
+                            modifier = Modifier.size(28.dp),
+                        )
+                    }
+
+                    Spacer(Modifier.height(18.dp))
 
                     Text(
                         text = storage.title,
                         style = MaterialTheme.typography.titleLarge,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontSize = 38.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2
                     )
 
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = "Criado em: ${dateFormat.format(Date(storage.createdAt))}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "Clique no card correspondente para visualizar as informações do estoque, incluindo os respectivos itens e a quantidade total.",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     Row(
                         Modifier
                             .fillMaxWidth()
                             .padding(vertical = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        IconButton(
-                            onClick = onEditClick,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(Color.Blue)
-                                .padding(15.dp,10.dp)
-                                .size(24.dp)
+                        Row(
+                            Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Editar",
+                            StorageButtons(
+                                color = Color(0xFF4382DF),
+                                onAction = { onEditClick() },
+                                icon = Icons.Default.Edit,
+                                description = "Editar"
                             )
-                        }
 
-                        IconButton(
-                            onClick = { showDialog.value = true },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(Color.Red)
-                                .padding(15.dp,10.dp)
-                                .size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Lixeira",
+                            Spacer(Modifier.width(10.dp))
+
+                            StorageButtons(
+                                color = Color(0xFFDC0000),
+                                onAction = { showDialog.value = true },
+                                icon = Icons.Default.DeleteForever,
+                                description = "Excluir"
                             )
                         }
                     }
                 }
-
-                Spacer(Modifier.width(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(storage.mainColor.toInt()))
-                )
             }
         }
+    }
+}
+
+
+@Composable
+fun StorageButtons(
+    color: Color,
+    onAction: () -> Unit,
+    icon: ImageVector,
+    description: String
+) {
+    IconButton(
+        onClick = { onAction() },
+        modifier = Modifier
+            .clip(RoundedCornerShape(15.dp))
+            .background(color)
+            .padding(25.dp,5.dp)
+            .size(20.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description
+        )
     }
 }
