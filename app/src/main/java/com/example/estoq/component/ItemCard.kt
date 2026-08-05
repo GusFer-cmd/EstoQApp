@@ -32,7 +32,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.estoq.data.Model.Item.Item
+import com.example.estoq.ui.theme.ActionGreen
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -77,14 +77,14 @@ fun ItemCard(
                         modifier = Modifier
                             .size(50.dp)
                             .background(
-                                color = Color(0xFFFFF3E0),
+                                color = MaterialTheme.colorScheme.errorContainer,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "!",
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -112,10 +112,14 @@ fun ItemCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
-                    OutlinedButton(
+                    Button(
                         modifier = Modifier.weight(1f),
                         onClick = { showDialog.value = false },
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Cancelar")
                     }
@@ -127,11 +131,12 @@ fun ItemCard(
                             showDialog.value = false
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar", color = Color.White)
+                        Text("Deletar")
                     }
                 }
             }
@@ -223,7 +228,7 @@ fun ItemCard(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -243,7 +248,7 @@ fun ItemCard(
                     ) {
                         Box(
                             modifier = Modifier
-                                .border(1.dp, Color.White, RoundedCornerShape(6.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(6.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
@@ -264,7 +269,7 @@ fun ItemCard(
                                     imageVector = Icons.Default.CheckCircleOutline,
                                     contentDescription = "Icone de status de estoque",
                                     modifier = Modifier.size(14.dp),
-                                    tint = Color.Green
+                                    tint = ActionGreen
                                 )
 
                                 Text(
@@ -388,6 +393,7 @@ fun ItemButtons(
         Icon(
             imageVector = icon,
             contentDescription = description,
+            tint = Color.White
         )
     }
 }

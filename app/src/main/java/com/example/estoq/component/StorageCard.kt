@@ -28,7 +28,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -76,14 +75,14 @@ fun StorageCard(
                         modifier = Modifier
                             .size(50.dp)
                             .background(
-                                color = Color(0xFFFFF3E0),
+                                color = MaterialTheme.colorScheme.errorContainer,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "!",
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -111,10 +110,14 @@ fun StorageCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
-                    OutlinedButton(
+                    Button(
                         modifier = Modifier.weight(1f),
                         onClick = { showDialog.value = false },
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Cancelar")
                     }
@@ -126,11 +129,12 @@ fun StorageCard(
                             showDialog.value = false
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar", color = Color.White)
+                        Text("Deletar")
                     }
                 }
             }

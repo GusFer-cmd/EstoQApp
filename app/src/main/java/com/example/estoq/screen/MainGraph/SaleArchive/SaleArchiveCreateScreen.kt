@@ -124,7 +124,7 @@ fun SaleArchiveCreateScreen(
                                 text = priceFormat.format(state.totalValue),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.secondary,
                                 fontSize = 12.sp
                             )
                         }

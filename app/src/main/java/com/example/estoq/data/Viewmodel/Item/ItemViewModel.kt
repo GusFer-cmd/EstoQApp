@@ -81,6 +81,11 @@ class ItemViewModel(
         _uiState.value = _uiState.value.copy(currentPrice = digits, currentPriceError = null)
     }
 
+    fun onCostPriceChange(value: String) {
+        val digits = value.filter { it.isDigit() }
+        _uiState.value = _uiState.value.copy(costPrice = digits, costPriceError = null)
+    }
+
     fun onQuantityChange(value: String) {
         _uiState.value = _uiState.value.copy(stockQuantity = value, stockQuantityError = null)
     }
@@ -134,6 +139,7 @@ class ItemViewModel(
                         name = item.name,
                         brand = item.brand,
                         currentPrice = item.currentPrice.let { formatPrice(it) },
+                        costPrice = item.costPrice.let { formatPrice(it) },
                         stockQuantity = item.stockQuantity.toString(),
                         imagePath = item.imagePath,
                         storageId = item.storageId,
@@ -177,6 +183,9 @@ class ItemViewModel(
                 if (state.currentPrice.isBlank()) {
                     throw ItemException.InvalidPriceException()
                 }
+                if (state.costPrice.isBlank()) {
+                    throw ItemException.InvalidCostPriceException()
+                }
                 if (state.stockQuantity.isBlank()) {
                     throw ItemException.InvalidQuantityException()
                 }
@@ -191,6 +200,7 @@ class ItemViewModel(
                         name = state.name.trim(),
                         brand = state.brand.trim(),
                         currentPrice = parsePrice(state.currentPrice),
+                        costPrice = parsePrice(state.costPrice),
                         stockQuantity = state.stockQuantity.toInt(),
                         imagePath = state.imagePath,
                         storageId = state.storageId,
@@ -214,6 +224,8 @@ class ItemViewModel(
                         _uiState.value.copy(brandError = e.message)
                     is ItemException.InvalidPriceException ->
                         _uiState.value.copy(currentPriceError = e.message)
+                    is ItemException.InvalidCostPriceException ->
+                        _uiState.value.copy(costPriceError = e.message)
                     is ItemException.InvalidQuantityException ->
                         _uiState.value.copy(stockQuantityError = e.message)
                     is ItemException.EmptyStorageException ->
@@ -251,7 +263,10 @@ class ItemViewModel(
                     throw ItemException.InvalidIdException()
                 }
                 if (state.currentPrice.isBlank()) {
-                  throw ItemException.InvalidPriceException()
+                    throw ItemException.InvalidPriceException()
+                }
+                if (state.costPrice.isBlank()) {
+                    throw ItemException.InvalidCostPriceException()
                 }
                 if (state.stockQuantity.isBlank()) {
                    throw ItemException.InvalidQuantityException()
@@ -268,6 +283,7 @@ class ItemViewModel(
                         name = state.name.trim(),
                         brand = state.brand.trim(),
                         currentPrice = parsePrice(state.currentPrice),
+                        costPrice = parsePrice(state.costPrice),
                         stockQuantity = state.stockQuantity.toInt(),
                         imagePath = state.imagePath,
                         storageId = state.storageId,
@@ -292,6 +308,8 @@ class ItemViewModel(
                         _uiState.value.copy(brandError = e.message)
                     is ItemException.InvalidPriceException ->
                         _uiState.value.copy(currentPriceError = e.message)
+                    is ItemException.InvalidCostPriceException ->
+                        _uiState.value.copy(costPriceError = e.message)
                     is ItemException.InvalidQuantityException ->
                         _uiState.value.copy(stockQuantityError = e.message)
                     is ItemException.EmptyStorageException ->

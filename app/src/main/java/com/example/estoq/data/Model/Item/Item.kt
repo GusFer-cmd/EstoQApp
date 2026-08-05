@@ -10,6 +10,7 @@ data class Item(
     val name: String,
     val brand: String,
     val currentPrice: Double,
+    val costPrice: Double = 0.0,
     val stockQuantity: Int,
     val imagePath: String? = null,
     val storageId: Long,

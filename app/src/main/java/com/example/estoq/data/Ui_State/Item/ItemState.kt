@@ -14,6 +14,9 @@ data class ItemUiState(
     val currentPrice: String = "",
     val currentPriceError: String? = null,
 
+    val costPrice: String = "",
+    val costPriceError: String? = null,
+
     val stockQuantity: String = "",
     val stockQuantityError: String? = null,
 

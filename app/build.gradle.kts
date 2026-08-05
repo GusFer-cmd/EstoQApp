@@ -46,12 +46,15 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.3.0")) //BOM do Firebase para gerenciar versões
     implementation("com.google.firebase:firebase-auth") //Autenticação do Firebase
-    implementation("com.google.android.gms:play-services-auth:21.2.0") //Autenticação com Google Play Services
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation(libs.androidx.work.runtime.ktx) //Autenticação com Google Play Services
 
     val credentialsManagerVersion = "1.3.0" //Gerenciamento de credenciais
     implementation("androidx.credentials:credentials:$credentialsManagerVersion") //Gerenciamento de credenciais
     implementation("androidx.credentials:credentials-play-services-auth:$credentialsManagerVersion") //Gerenciamento de credenciais com Play Services Auth
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    implementation("androidx.work:work-runtime-ktx:2.9.0") //WorkManager
 
     implementation("androidx.compose.material:material-icons-extended") //Ícones
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0") //Viewmodel

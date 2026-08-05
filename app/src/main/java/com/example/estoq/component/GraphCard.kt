@@ -41,8 +41,8 @@ fun GraphCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF355872),
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
         ),
         modifier = Modifier
             .fillMaxWidth(),

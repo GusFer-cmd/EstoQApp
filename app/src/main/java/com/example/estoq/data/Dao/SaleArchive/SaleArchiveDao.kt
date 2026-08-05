@@ -8,12 +8,6 @@ import androidx.room.Update
 import com.example.estoq.data.Model.SaleArchive.SaleArchive
 import kotlinx.coroutines.flow.Flow
 
-data class SalesByPeriod(
-    val period: String,
-    val count: Int,
-    val totalValue: Double
-)
-
 @Dao
 interface SaleArchiveDao {
 
@@ -26,6 +20,9 @@ interface SaleArchiveDao {
     @Query("SELECT * FROM SaleArchive WHERE clientId = :clientId ORDER BY createdAt DESC")
     fun getAllByClientId(clientId: Long): Flow<List<SaleArchive>>
 
+    @Query("SELECT * FROM SaleArchive WHERE createdAt BETWEEN :startMillis AND :endMillis ORDER BY createdAt ASC")
+    fun getSalesBetween(startMillis: Long, endMillis: Long): Flow<List<SaleArchive>>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(saleArchive: SaleArchive): Long
 
@@ -34,14 +31,4 @@ interface SaleArchiveDao {
 
     @Query("DELETE FROM SaleArchive WHERE id = :id")
     suspend fun delete(id: Long)
-
-    @Query("""
-        SELECT strftime('%Y-%m', createdAt / 1000, 'unixepoch') AS period,
-               COUNT(*) AS count,
-               SUM(totalValue) AS totalValue
-        FROM SaleArchive
-        GROUP BY period
-        ORDER BY period ASC
-    """)
-    fun getSalesByPeriod(): Flow<List<SalesByPeriod>>
 }

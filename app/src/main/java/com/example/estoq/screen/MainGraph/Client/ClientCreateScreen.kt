@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.estoq.component.Container
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
@@ -190,6 +192,7 @@ fun ClientCreateScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         trailingIcon = {
                             if (state.isAddressLoading) {
                                 CircularProgressIndicator(
@@ -329,7 +332,8 @@ fun ClientCreateScreen(
                             .height(50.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Green
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         ),
                         enabled = !state.isLoading
                     ) {
@@ -344,7 +348,6 @@ fun ClientCreateScreen(
                                 text = "Salvar",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
                             )
                         }
                     }

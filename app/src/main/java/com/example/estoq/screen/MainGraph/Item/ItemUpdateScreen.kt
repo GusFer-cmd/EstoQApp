@@ -409,6 +409,37 @@ fun ItemUpdateScreen(
                             Spacer(Modifier.height(16.dp))
 
                             Text(
+                                text = "Preço de Custo",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            OutlinedTextField(
+                                value = state.costPrice,
+                                onValueChange = { itemViewModel.onCostPriceChange(it) },
+                                isError = state.costPriceError != null,
+                                placeholder = { Text("0") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                visualTransformation = CurrencyVisualTransformation()
+                            )
+
+                            state.costPriceError?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            Text(
                                 text = "Quantidade em Estoque",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold
@@ -579,14 +610,14 @@ fun ItemUpdateScreen(
                                     .height(50.dp),
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green
+                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                    contentColor = MaterialTheme.colorScheme.onSecondary
                                 )
                             ) {
                                 Text(
                                     text = "Salvar",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
                                 )
                             }
 

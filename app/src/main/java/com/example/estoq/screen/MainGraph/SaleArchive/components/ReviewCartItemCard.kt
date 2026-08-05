@@ -97,7 +97,7 @@ internal fun ReviewCartItemCard(
                     text = priceFormat.format(cartItem.subtotal),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }

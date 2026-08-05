@@ -31,7 +31,7 @@ val repositoryModule = module {
     }
 
     single {
-        PivotSaleItemRepository(get())
+        PivotSaleItemRepository(get(), get())
     }
 
     single {

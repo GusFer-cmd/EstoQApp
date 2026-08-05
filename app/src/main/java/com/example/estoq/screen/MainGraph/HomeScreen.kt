@@ -17,13 +17,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,16 +42,20 @@ import androidx.compose.ui.unit.sp
 import com.example.estoq.component.Container
 import com.example.estoq.component.GraphCard
 import com.example.estoq.component.HomeCard
-import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    loginViewModel: LoginViewModel,
     totalStorages: Int,
     totalItems: Int,
     totalClients: Int,
     totalSales: Int,
+    darkTheme: Boolean,
+    onToggleTheme: () -> Unit,
+    onBestSeller: () -> Unit,
+    onWorstSeller: () -> Unit,
+    onLastUnit: () -> Unit,
+    onMonthlyProfit: () -> Unit,
     onLogout: () -> Unit
 ) {
 
@@ -62,6 +69,13 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("Início")},
                 actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Icon(
+                            imageVector = if (darkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                            contentDescription = if (darkTheme) "Modo claro" else "Modo escuro"
+                        )
+                    }
+
                     Button(
                         onClick = onLogout,
                         colors = ButtonDefaults.buttonColors(
@@ -164,7 +178,7 @@ fun HomeScreen(
                                     tittle = "Mais vendidos",
                                     description = "Itens mais vendidos do estoque",
                                     icon = painterResource(id = com.example.estoq.R.drawable.flame),
-                                    onNavigate = { }
+                                    onNavigate = { onBestSeller() }
                                 )
                             }
 
@@ -173,7 +187,7 @@ fun HomeScreen(
                                     tittle = "Menos vendidos",
                                     description = "Itens menos vendidos do estoque",
                                     icon = painterResource(id = com.example.estoq.R.drawable.snowflake),
-                                    onNavigate = { }
+                                    onNavigate = { onWorstSeller() }
                                 )
                             }
 
@@ -182,7 +196,7 @@ fun HomeScreen(
                                     tittle = "Últimas unidades",
                                     description = "Poucas unidades no estoque",
                                     icon = painterResource(id = com.example.estoq.R.drawable.alert),
-                                    onNavigate = { }
+                                    onNavigate = { onLastUnit() }
                                 )
                             }
 
@@ -191,7 +205,7 @@ fun HomeScreen(
                                     tittle = "Lucro Mensal",
                                     description = "Vendas por mês",
                                     icon = painterResource(id = com.example.estoq.R.drawable.coin),
-                                    onNavigate = { }
+                                    onNavigate = { onMonthlyProfit() }
                                 )
                             }
                         }

@@ -1,5 +1,6 @@
 package com.example.estoq.koin
 
+import com.example.estoq.data.Viewmodel.Analytic.AnalyticViewModel
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemCategoryViewModel
@@ -37,6 +38,10 @@ val viewModelModule = module {
     }
 
     viewModel {
-        SaleArchiveViewModel(get(), get(), get(), get())
+        SaleArchiveViewModel(get(), get(), get(), get(), getOrNull())
+    }
+
+    viewModel {
+        AnalyticViewModel(get(), get())
     }
 }

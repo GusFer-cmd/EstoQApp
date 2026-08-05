@@ -175,7 +175,8 @@ fun StorageUpdateScreen(
                                 .height(50.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Green
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary
                             ),
                             enabled = !state.isLoading
                         ) {
@@ -190,7 +191,6 @@ fun StorageUpdateScreen(
                                     text = "Salvar",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
                                 )
                             }
                         }

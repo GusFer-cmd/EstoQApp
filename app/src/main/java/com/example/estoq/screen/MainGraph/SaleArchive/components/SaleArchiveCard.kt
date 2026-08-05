@@ -96,7 +96,7 @@ internal fun SaleArchiveCard(
                 text = priceFormat.format(sale.totalValue),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }

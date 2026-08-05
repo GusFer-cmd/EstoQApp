@@ -10,7 +10,9 @@ val databaseModule = module {
             get(),
             Database::class.java,
             "estoq_db"
-        ).fallbackToDestructiveMigration(true).build()
+        )
+            .addMigrations(Database.MIGRATION_11_12)
+            .fallbackToDestructiveMigration(true).build()
     }
 
     single {

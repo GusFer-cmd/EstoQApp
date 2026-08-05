@@ -30,7 +30,8 @@ fun HomeCard(
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
-        )
+        ),
+        colors = CardDefaults.cardColors(contentColor = Color.White)
     ) {
         Column(
             modifier = Modifier

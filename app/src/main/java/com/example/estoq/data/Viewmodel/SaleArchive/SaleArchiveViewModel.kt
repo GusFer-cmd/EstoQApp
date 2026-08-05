@@ -14,6 +14,8 @@ import com.example.estoq.data.Repository.SaleArchive.SaleArchiveRepository
 import com.example.estoq.data.Ui_State.SaleArchive.CartUiItem
 import com.example.estoq.data.Ui_State.SaleArchive.DetailSaleItem
 import com.example.estoq.data.Ui_State.SaleArchive.SaleArchiveUiState
+import com.example.estoq.notification.manager.NotificationDispatcher
+import com.example.estoq.notification.model.NotificationEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,8 @@ class SaleArchiveViewModel(
     private val saleArchiveRepository: SaleArchiveRepository,
     private val pivotSaleItemRepository: PivotSaleItemRepository,
     private val itemRepository: ItemRepository,
-    private val clientRepository: ClientRepository
+    private val clientRepository: ClientRepository,
+    private val notificationDispatcher: NotificationDispatcher? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaleArchiveUiState())
@@ -144,10 +147,6 @@ class SaleArchiveViewModel(
 
     fun clearIsCreated() {
         _uiState.value = _uiState.value.copy(isCreated = false)
-    }
-
-    fun clearIsUpdated() {
-        _uiState.value = _uiState.value.copy(isUpdated = false)
     }
 
     fun clearIsDeleted() {
@@ -278,9 +277,40 @@ class SaleArchiveViewModel(
                     itemRepository.decrementStock(cartItem.itemId, cartItem.quantity)
                 }
 
+                val lowItems = mutableListOf<Item>()
+                val zeroItems = mutableListOf<Item>()
+                for (cartItem in state.cartItems) {
+                    val item = itemRepository.getById(cartItem.itemId)
+                    if (item != null) {
+                        when {
+                            item.stockQuantity == 0 -> zeroItems.add(item)
+                            item.stockQuantity <= 5 -> lowItems.add(item)
+                        }
+                    }
+                }
+                zeroItems.forEach { item ->
+                    notificationDispatcher?.dispatch(NotificationEvent.ZeroStock(item))
+                }
+                if (lowItems.isNotEmpty()) {
+                    notificationDispatcher?.dispatch(NotificationEvent.LowStock(lowItems))
+                }
+
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     isCreated = true
+                )
+
+                val client = clientRepository.getById(state.clientId)
+                val clientName = client?.let { "${it.firstName} ${it.lastName}".trim() }
+                    ?: "Cliente"
+
+                notificationDispatcher?.dispatch(
+                    NotificationEvent.SaleCreated(
+                        saleId = saleId,
+                        clientName = clientName,
+                        total = state.totalValue,
+                        itemCount = state.cartItems.sumOf { it.quantity }
+                    )
                 )
 
             } catch (e: SaleArchiveException) {
@@ -305,66 +335,19 @@ class SaleArchiveViewModel(
         }
     }
 
-    fun updateSaleArchive() {
-        val state = _uiState.value
-
-        viewModelScope.launch {
-            try {
-                if (state.clientId == 0L) {
-                    throw SaleArchiveException.EmptyClientIdException()
-                }
-                if (state.installment.isBlank()) {
-                    throw SaleArchiveException.EmptyInstallmenteException()
-                }
-                if (state.id == 0L) {
-                    throw SaleArchiveException.InvalidIdException()
-                }
-
-                _uiState.value = state.copy(isLoading = true)
-
-                saleArchiveRepository.update(
-                    SaleArchive(
-                        id = state.id,
-                        clientId = state.clientId,
-                        paymentMethod = state.paymentMethod,
-                        installment = state.installment,
-                        totalValue = state.totalValue,
-                        createdAt = state.createdAt
-                    )
-                )
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    isUpdated = true
-                )
-            } catch (e: SaleArchiveException) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-                _uiState.value = when (e) {
-                    is SaleArchiveException.EmptyClientIdException ->
-                        _uiState.value.copy(clientIdError = e.message)
-                    is SaleArchiveException.EmptyInstallmenteException ->
-                        _uiState.value.copy(installmentError = e.message)
-                    is SaleArchiveException.InvalidIdException ->
-                        _uiState.value.copy(error = e.message)
-                    is SaleArchiveException.SaleArchiveUnknownException ->
-                        _uiState.value.copy(error = e.message)
-                    else -> _uiState.value.copy(error = e.message)
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
-            }
-        }
-    }
-
     fun deleteSaleArchive(id: Long) {
         viewModelScope.launch {
             try {
                 if (id == 0L) throw SaleArchiveException.InvalidIdException()
 
                 _uiState.value = _uiState.value.copy(isLoading = true)
+
+                val saleArchive = saleArchiveRepository.getById(id)
+                val clientName = saleArchive?.let {
+                    clientRepository.getById(it.clientId)?.let { c ->
+                        "${c.firstName} ${c.lastName}"
+                    }
+                } ?: "Cliente"
 
                 val pivotItems = pivotSaleItemRepository.getItemsBySaleArchiveId(id)
                 for (pivotItem in pivotItems) {
@@ -373,6 +356,26 @@ class SaleArchiveViewModel(
 
                 saleArchiveRepository.delete(id)
                 _uiState.value = _uiState.value.copy(isLoading = false, isDeleted = true)
+
+                if (saleArchive != null) {
+                    notificationDispatcher?.dispatch(
+                        NotificationEvent.SaleDeleted(
+                            saleId = id,
+                            clientName = clientName,
+                            total = saleArchive.totalValue
+                        )
+                    )
+                }
+
+                val restoredNames = pivotItems.mapNotNull { pivotItem ->
+                    itemRepository.getById(pivotItem.itemId)?.name
+                }
+                if (restoredNames.isNotEmpty()) {
+                    notificationDispatcher?.dispatch(
+                        NotificationEvent.StockRestored(restoredNames)
+                    )
+                }
+
             } catch (e: SaleArchiveException) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

@@ -90,8 +90,8 @@ internal fun CartStep(
             enabled = cartItems.isNotEmpty(),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White,
-                containerColor = Color(0xFF4CAF50)
+                contentColor = MaterialTheme.colorScheme.onSecondary,
+                containerColor = MaterialTheme.colorScheme.secondary
             )
         ) {
             Text("Continuar")

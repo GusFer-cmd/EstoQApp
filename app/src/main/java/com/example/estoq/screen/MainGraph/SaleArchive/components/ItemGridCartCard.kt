@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.estoq.data.Model.Item.Item
+import com.example.estoq.ui.theme.ActionGreen
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -127,7 +128,7 @@ fun ItemGridCartCard(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -164,7 +165,7 @@ fun ItemGridCartCard(
                                 imageVector = Icons.Default.CheckCircleOutline,
                                 contentDescription = "Estoque",
                                 modifier = Modifier.size(12.dp),
-                                tint = Color.Green
+                                tint = ActionGreen
                             )
                             Text(
                                 text = "$remainingStock un.",
@@ -215,7 +216,7 @@ fun ItemGridCartCard(
                         .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                         .background(
                             if (remainingStock <= 0) Color.Gray.copy(alpha = 0.3f)
-                            else Color(0xFF4CAF50)
+                            else ActionGreen
                         )
                 ) {
                     Icon(

@@ -109,7 +109,7 @@ internal fun PaymentStep(
                         text = priceFormat.format(totalValue),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -189,8 +189,8 @@ internal fun PaymentStep(
             enabled = !isLoading && installment.isNotBlank(),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White,
-                containerColor = Color(0xFF4CAF50)
+                contentColor = MaterialTheme.colorScheme.onSecondary,
+                containerColor = MaterialTheme.colorScheme.secondary
             )
         ) {
             if (isLoading) {

@@ -130,8 +130,8 @@ fun ClientScreen(
                     Button(
                         onClick = onNavigateToCreate,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50),
-                            contentColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         )
                     ) {
                         Icon(
@@ -174,17 +174,17 @@ fun ClientScreen(
                     hostState = snackbarHostState,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     snackbar = { snackbarData ->
-                        val backgroundColor = when {
+                        val snackbarColors = when {
                             snackbarData.visuals.message.contains("sucesso", ignoreCase = true) ->
-                                Color(0xFF2B5748)
+                                MaterialTheme.colorScheme.secondary to MaterialTheme.colorScheme.onSecondary
                             else ->
-                                Color(0xFF95271D)
+                                MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
                         }
 
                         Snackbar(
                             snackbarData = snackbarData,
-                            containerColor = backgroundColor,
-                            contentColor = Color.White,
+                            containerColor = snackbarColors.first,
+                            contentColor = snackbarColors.second,
                         )
                     }
                 )

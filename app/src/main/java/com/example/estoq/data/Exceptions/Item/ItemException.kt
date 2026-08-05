@@ -4,6 +4,7 @@ sealed class ItemException(message: String) : Exception(message) {
     class EmptyNameException : ItemException("O campo nome é obrigatório")
     class EmptyBrandException : ItemException("O campo marca é obrigatório")
     class InvalidPriceException : ItemException("Preço inválido")
+    class InvalidCostPriceException : ItemException("Preço de custo inválido")
     class InvalidQuantityException : ItemException("Quantidade inválida")
     class EmptySizeException : ItemException("Selecione um tamanho")
     class EmptyStorageException : ItemException("Selecione um estoque")

@@ -41,6 +41,14 @@ sealed class Screen(
         fun createRoute(id: Long) = "sale/detail/$id"
     }
 
+    object BestSellers : Screen("best_sellers")
+
+    object WorstSellers : Screen("worst_sellers")
+
+    object LastUnits : Screen("last_units")
+
+    object MonthlyProfit : Screen("monthly_profit")
+
 }
 
 data class BottomNavItem(

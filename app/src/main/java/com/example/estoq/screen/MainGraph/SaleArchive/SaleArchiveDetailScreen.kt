@@ -30,7 +30,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -91,14 +90,14 @@ fun SaleArchiveDetailScreen(
                         modifier = Modifier
                             .size(50.dp)
                             .background(
-                                color = Color(0xFFFFF3E0),
+                                color = MaterialTheme.colorScheme.errorContainer,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "!",
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
@@ -123,10 +122,14 @@ fun SaleArchiveDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedButton(
+                    Button(
                         modifier = Modifier.weight(1f),
                         onClick = { showDeleteDialog = false },
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Cancelar")
                     }
@@ -139,11 +142,12 @@ fun SaleArchiveDetailScreen(
                             onNavigateBack()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
+                            containerColor = Color(0xFFDC0000),
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Deletar", color = Color.Black)
+                        Text("Deletar")
                     }
                 }
             }
@@ -287,7 +291,7 @@ fun SaleArchiveDetailScreen(
                                                 text = priceFormat.format(item.subtotal),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.primary
+                                                color = MaterialTheme.colorScheme.secondary
                                             )
                                         }
                                         Spacer(Modifier.height(4.dp))
@@ -330,7 +334,7 @@ fun SaleArchiveDetailScreen(
                                     text = priceFormat.format(state.totalValue),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         }

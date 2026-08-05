@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.estoq.data.Model.Item.Item
+import com.example.estoq.ui.theme.ActionGreen
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -151,7 +152,7 @@ fun ItemGridCard(item: Item) {
                                 imageVector = Icons.Default.CheckCircleOutline,
                                 contentDescription = "Icone de status de estoque",
                                 modifier = Modifier.size(12.dp),
-                                tint = Color.Green
+                                tint = ActionGreen
                             )
 
                             Text(

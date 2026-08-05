@@ -3,6 +3,8 @@ package com.example.estoq.data.Database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.estoq.data.Dao.Client.ClientDao
 import com.example.estoq.data.Dao.Item.ItemDao
 import com.example.estoq.data.Dao.PivotSaleItem.PivotSaleItemDao
@@ -18,13 +20,19 @@ import com.example.estoq.data.Model.User.User
 
 @Database(
     entities = [User::class, Storage::class, Item::class, Client::class, SaleArchive::class, PivotSaleItem::class],
-    version = 11
+    version = 12
 )
 @TypeConverters(Converters::class)
 abstract class Database : RoomDatabase() {
 
     companion object {
         const val DB_NAME = "estoq_db"
+
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE Item ADD COLUMN costPrice REAL NOT NULL DEFAULT 0")
+            }
+        }
     }
 
     abstract fun userDao() : UserDao

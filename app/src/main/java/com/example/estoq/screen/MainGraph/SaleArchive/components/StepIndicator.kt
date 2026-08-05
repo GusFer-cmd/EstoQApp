@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.estoq.ui.theme.ActionGreen
 
 @Composable
 internal fun StepIndicator(
@@ -47,7 +48,7 @@ internal fun StepIndicator(
                         .clip(CircleShape)
                         .background(
                             when {
-                                isCompleted -> Color(0xFF4CAF50)
+                                isCompleted -> ActionGreen
                                 isActive -> MaterialTheme.colorScheme.primary
                                 else -> MaterialTheme.colorScheme.surfaceVariant
                             }

@@ -9,7 +9,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import org.koin.androidx.compose.koinViewModel
+import com.example.estoq.data.Viewmodel.Analytic.AnalyticViewModel
 import com.example.estoq.data.Viewmodel.Auth.LoginViewModel
 import com.example.estoq.data.Viewmodel.Client.ClientViewModel
 import com.example.estoq.data.Viewmodel.Item.ItemCategoryViewModel
@@ -18,6 +20,10 @@ import com.example.estoq.data.Viewmodel.SaleArchive.SaleArchiveViewModel
 import com.example.estoq.data.Viewmodel.Storage.StorageViewModel
 import com.example.estoq.screen.AuthGraph.LoginScreen
 import com.example.estoq.screen.AuthGraph.RegisterScreen
+import com.example.estoq.screen.MainGraph.Analytic.BestSellerScreen
+import com.example.estoq.screen.MainGraph.Analytic.LastUnitScreen
+import com.example.estoq.screen.MainGraph.Analytic.MonthlyProfitScreen
+import com.example.estoq.screen.MainGraph.Analytic.WorstSellerScreen
 import com.example.estoq.screen.MainGraph.Client.ClientCreateScreen
 import com.example.estoq.screen.MainGraph.Client.ClientDetailScreen
 import com.example.estoq.screen.MainGraph.Client.ClientScreen
@@ -38,16 +44,22 @@ import com.example.estoq.screen.SplashScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    darkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
     val storageViewModel: StorageViewModel = koinViewModel()
     val itemViewModel: ItemViewModel = koinViewModel()
     val clientViewModel: ClientViewModel = koinViewModel()
     val saleArchiveViewModel: SaleArchiveViewModel = koinViewModel()
+    val analyticViewModel: AnalyticViewModel = koinViewModel()
+
     val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
     val items by itemViewModel.allItems.collectAsState(initial = emptyList())
     val clients by clientViewModel.allClients.collectAsState(initial = emptyList())
     val sales by saleArchiveViewModel.allSales.collectAsState(initial = emptyList())
+    val bestAnalytics by analyticViewModel.bestSellers.collectAsState(initial = emptyList())
+    val worstAnalytics by analyticViewModel.worstSellers.collectAsState(initial = emptyList())
 
     NavHost(
         navController = navController,
@@ -123,18 +135,32 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.Home.route) {
-
-            val loginViewModel: LoginViewModel = koinViewModel()
+        composable(
+            route = Screen.Home.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "estoq://home" })
+        ) {
 
             val storages by storageViewModel.allStorages.collectAsState(initial = emptyList())
 
             HomeScreen(
-                loginViewModel = loginViewModel,
                 totalStorages = storages.size,
                 totalItems = items.size,
                 totalClients = clients.size,
                 totalSales =  sales.size,
+                darkTheme = darkTheme,
+                onToggleTheme = onToggleTheme,
+                onBestSeller = {
+                    navController.navigate(Screen.BestSellers.route)
+                },
+                onWorstSeller = {
+                    navController.navigate(Screen.WorstSellers.route)
+                },
+                onLastUnit = {
+                    navController.navigate(Screen.LastUnits.route)
+                },
+                onMonthlyProfit = {
+                    navController.navigate(Screen.MonthlyProfit.route)
+                },
                 onLogout = {
                     navController.navigate(
                         Screen.Login.route
@@ -145,7 +171,10 @@ fun AppNavGraph(
             )
         }
 
-        composable(Screen.StorageIndex.route) {
+        composable(
+            route = Screen.StorageIndex.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "estoq://storage/index" })
+        ) {
             StorageScreen(
                 storageViewModel = storageViewModel,
                 onNavigateToCreate = {
@@ -187,7 +216,10 @@ fun AppNavGraph(
         }
 
 
-        composable(Screen.ItemIndex.route) {
+        composable(
+            route = Screen.ItemIndex.route,
+            deepLinks = listOf(navDeepLink { uriPattern = "estoq://item/index" })
+        ) {
             ItemScreen(
                 itemViewModel = itemViewModel,
                 onNavigateToCreate = {
@@ -212,7 +244,8 @@ fun AppNavGraph(
 
         composable(
             route = Screen.ItemUpdate.route,
-            arguments = listOf(navArgument("id") { type = NavType.LongType })
+            arguments = listOf(navArgument("id") { type = NavType.LongType }),
+            deepLinks = listOf(navDeepLink { uriPattern = "estoq://item/update/{id}" })
         ) { backStackEntry ->
 
             val id = backStackEntry.arguments?.getLong("id") ?: 0L
@@ -327,12 +360,49 @@ fun AppNavGraph(
 
         composable(
             route = Screen.SaleArchiveDetail.route,
-            arguments = listOf(navArgument("id") { type = NavType.LongType })
+            arguments = listOf(navArgument("id") { type = NavType.LongType }),
+            deepLinks = listOf(navDeepLink { uriPattern = "estoq://sale/detail/{id}" })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getLong("id") ?: 0L
             SaleArchiveDetailScreen(
                 id = id,
                 saleArchiveViewModel = saleArchiveViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.BestSellers.route) {
+            BestSellerScreen(
+                bestSeller = bestAnalytics,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.WorstSellers.route) {
+            WorstSellerScreen(
+                worstSeller = worstAnalytics,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.LastUnits.route) {
+            LastUnitScreen(
+                analyticViewModel = analyticViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.MonthlyProfit.route) {
+            MonthlyProfitScreen(
+                analyticViewModel = analyticViewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }
