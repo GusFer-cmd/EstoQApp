@@ -114,7 +114,7 @@ fun ItemGridCard(item: Item) {
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -131,7 +131,7 @@ fun ItemGridCard(item: Item) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .border(1.dp, Color.White, RoundedCornerShape(6.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(6.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(

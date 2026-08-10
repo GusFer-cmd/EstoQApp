@@ -241,6 +241,7 @@ fun ClientButtons(
         Icon(
             imageVector = icon,
             contentDescription = description,
+            tint = Color.White
         )
     }
 }

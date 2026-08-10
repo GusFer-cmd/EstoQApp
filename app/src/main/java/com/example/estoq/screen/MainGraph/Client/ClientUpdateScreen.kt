@@ -350,6 +350,7 @@ fun ClientUpdateScreen(
                                     text = "Salvar",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
+                                    color = Color.White
                                 )
                             }
                         }

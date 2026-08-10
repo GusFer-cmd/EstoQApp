@@ -104,10 +104,7 @@ fun MonthlyProfitScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Lucro Mensal",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text("Lucro Mensal")
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -255,7 +252,7 @@ fun MonthlyProfitScreen(
                                                         style = MaterialTheme.typography.titleMedium,
                                                         fontWeight = FontWeight.Bold,
                                                         fontSize = 15.sp,
-                                                        color = MaterialTheme.colorScheme.primary
+                                                        color = MaterialTheme.colorScheme.onSurface
                                                     )
 
                                                     Text(
@@ -408,7 +405,7 @@ private fun StatCard(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(28.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(Modifier.size(12.dp))
@@ -455,7 +452,7 @@ private fun MonthProfitRow(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.onSurface
                 } else {
                     Color.Unspecified
                 }

@@ -75,7 +75,6 @@ fun ItemCategoryScreen(
                             text = "$itemCount produto(s)",
                             fontSize = 14.sp
                         )
-
                     }
                 },
                 navigationIcon = {

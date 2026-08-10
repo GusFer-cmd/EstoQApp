@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.estoq.component.Container
 import com.example.estoq.component.LastUnitCard
 import com.example.estoq.data.Model.Item.Item
@@ -59,6 +60,8 @@ fun LastUnitScreen(
 
     val state by analyticViewModel.uiState.collectAsState()
     val items by analyticViewModel.lowStockItems.collectAsState(initial = emptyList())
+
+    val itemsCount = items.size
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -169,7 +172,23 @@ fun LastUnitScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Últimas Unidades") },
+                title = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(end = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Últimas Unidades"
+                        )
+
+                        Text(
+                            text = "$itemsCount produto(s)",
+                            fontSize = 14.sp
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(

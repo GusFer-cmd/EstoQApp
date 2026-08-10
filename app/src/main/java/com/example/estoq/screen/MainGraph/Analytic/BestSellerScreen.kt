@@ -3,6 +3,7 @@ package com.example.estoq.screen.MainGraph.Analytic
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.estoq.component.BestSellerCard
 import com.example.estoq.component.Container
 import com.example.estoq.component.SearchBar
@@ -43,6 +45,8 @@ fun BestSellerScreen(
 
     var searchQuery by remember { mutableStateOf("") }
 
+    val bestSellerCount = bestSeller.size
+
     val filtered = remember(bestSeller, searchQuery) {
         if (searchQuery.isBlank()) bestSeller
         else bestSeller.filter {
@@ -55,22 +59,33 @@ fun BestSellerScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Mais Vendidos",
-                        fontWeight = FontWeight.Bold
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(end = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                            Text(
+                                text = "Mais Vendidos"
+                            )
+
+                            Text(
+                                text = "$bestSellerCount itens",
+                                fontSize = 14.sp
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Voltar"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
             )
         }
     ) { padding ->
