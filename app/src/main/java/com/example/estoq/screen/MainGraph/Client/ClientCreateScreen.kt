@@ -103,7 +103,9 @@ fun ClientCreateScreen(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
+
                     Spacer(Modifier.height(8.dp))
+
                     OutlinedTextField(
                         value = state.firstName,
                         onValueChange = { clientViewModel.onFirstNameChange(it) },
@@ -129,7 +131,9 @@ fun ClientCreateScreen(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
+
                     Spacer(Modifier.height(8.dp))
+
                     OutlinedTextField(
                         value = state.lastName,
                         onValueChange = { clientViewModel.onLastNameChange(it) },
@@ -155,13 +159,16 @@ fun ClientCreateScreen(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
+
                     Spacer(Modifier.height(8.dp))
+
                     OutlinedTextField(
                         value = state.telephone,
                         onValueChange = { clientViewModel.onTelephoneChange(it) },
                         isError = state.telephoneError != null,
                         placeholder = { Text("(99) 99999-9999") },
                         shape = RoundedCornerShape(16.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -310,7 +317,9 @@ fun ClientCreateScreen(
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold
                             )
+
                             Spacer(Modifier.height(8.dp))
+
                             OutlinedTextField(
                                 value = state.estado,
                                 onValueChange = {},

@@ -20,7 +20,7 @@ import com.example.estoq.data.Model.User.User
 
 @Database(
     entities = [User::class, Storage::class, Item::class, Client::class, SaleArchive::class, PivotSaleItem::class],
-    version = 12
+    version = 13
 )
 @TypeConverters(Converters::class)
 abstract class Database : RoomDatabase() {

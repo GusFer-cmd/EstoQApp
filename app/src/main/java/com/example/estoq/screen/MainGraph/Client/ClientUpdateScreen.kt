@@ -115,7 +115,9 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.firstName,
                             onValueChange = { clientViewModel.onFirstNameChange(it) },
@@ -141,7 +143,9 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.lastName,
                             onValueChange = { clientViewModel.onLastNameChange(it) },
@@ -167,13 +171,16 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.telephone,
                             onValueChange = { clientViewModel.onTelephoneChange(it) },
                             isError = state.telephoneError != null,
                             placeholder = { Text("(99) 99999-9999") },
                             shape = RoundedCornerShape(16.dp),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
@@ -193,7 +200,9 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.cep,
                             onValueChange = { clientViewModel.onCepChange(it) },
@@ -228,7 +237,9 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.logradouro,
                             onValueChange = {},
@@ -245,8 +256,11 @@ fun ClientUpdateScreen(
                             text = "Número",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
+
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.numero,
                             onValueChange = { clientViewModel.onNumeroChange(it) },
@@ -272,7 +286,9 @@ fun ClientUpdateScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
+
                         Spacer(Modifier.height(8.dp))
+
                         OutlinedTextField(
                             value = state.bairro,
                             onValueChange = {},
@@ -292,7 +308,9 @@ fun ClientUpdateScreen(
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.SemiBold
                                 )
+
                                 Spacer(Modifier.height(8.dp))
+
                                 OutlinedTextField(
                                     value = state.cidade,
                                     onValueChange = {},
@@ -312,7 +330,9 @@ fun ClientUpdateScreen(
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.SemiBold
                                 )
+
                                 Spacer(Modifier.height(8.dp))
+
                                 OutlinedTextField(
                                     value = state.estado,
                                     onValueChange = {},
